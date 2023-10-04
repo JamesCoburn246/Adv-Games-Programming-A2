@@ -389,8 +389,8 @@ Camera:
   m_GameObject: {fileID: 963194225}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -412,7 +412,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.01
-  far clip plane: 50
+  far clip plane: 1000
   field of view: 60
   orthographic: 0
   orthographic size: 7.5
@@ -869,9 +869,10 @@ MonoBehaviour:
   isoView: 0
   camMoveSpeed: 0.5
   camTurnSpeed: 15
+  camDistance: -5
   followTarget: {fileID: 722903088}
-  camDistance: 0
-  camIsoSmoothTime: 0
+  camIsoDistance: 7.5
+  camIsoSmoothTime: 0.3
 --- !u!1 &2090604580 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 185252, guid: ac72a98c062e432478eb557db53fdc1d, type: 3}
