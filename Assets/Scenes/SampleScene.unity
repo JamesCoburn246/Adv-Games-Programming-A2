@@ -195,8 +195,9 @@ MonoBehaviour:
   playerTransform: {fileID: 304652242}
   rigidBody: {fileID: 304652244}
   jumpCode: 32
-  movementSpeed: 10
+  baseMovementSpeed: 6
   attackingMovementSpeedMultiplier: 0.825
+  movementMultiplier: 1
   southpaw: 0
   attackCooldown: 0
 --- !u!54 &304652244
@@ -207,8 +208,8 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 304652239}
   serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
+  m_Mass: 1.5
+  m_Drag: 0.3
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
