@@ -2,14 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class PlayerMotionController : MonoBehaviour
 {
+    [Header("Unity Objects")]
+    [SerializeField] public Transform playerTransform;
+    [SerializeField] public Rigidbody rigidBody;
+
     [Header("Controls")]
     [SerializeField] public KeyCode jumpCode = KeyCode.Space;
 
     [Header("Movement")]
-    [SerializeField] public float movementSpeed;
-    [SerializeField] public float attackingMovementSpeedMultiplier = 0.9f;
+    [SerializeField] public float movementSpeed = 10.0f;
+    [SerializeField] public float attackingMovementSpeedMultiplier = 0.825f;
 
     [Header("Attacking")]
     [SerializeField] public bool southpaw = false;
@@ -23,10 +27,6 @@ public class NewBehaviourScript : MonoBehaviour
 
     // Animation Variables
     private bool _isGrounded;
-
-    // Player transform.
-    Transform playerTransform;
-    Rigidbody rigidbody;
 
     // Start is called before the first frame update
     private void Start()
@@ -53,12 +53,12 @@ public class NewBehaviourScript : MonoBehaviour
         // Not in an attack animation.
         if (elapsedCooldown == 0)
         {
-            this.rigidbody.AddForce(directionOfMotion.normalized * (movementSpeed), ForceMode.Force);
+            this.rigidBody.AddForce(directionOfMotion.normalized * (movementSpeed), ForceMode.Force);
         }
         // In an attack animation.
         else
         {
-            this.rigidbody.AddForce(directionOfMotion.normalized * (movementSpeed * attackingMovementSpeedMultiplier), ForceMode.Force);
+            this.rigidBody.AddForce(directionOfMotion.normalized * (movementSpeed * attackingMovementSpeedMultiplier), ForceMode.Force);
         }
     }
 
