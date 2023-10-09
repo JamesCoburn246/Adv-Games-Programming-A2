@@ -12,8 +12,9 @@ public class PlayerMotionController : MonoBehaviour
     [SerializeField] public KeyCode jumpCode = KeyCode.Space;
 
     [Header("Movement")]
-    [SerializeField] public float movementSpeed = 10.0f;
+    [SerializeField] public float baseMovementSpeed;
     [SerializeField] public float attackingMovementSpeedMultiplier = 0.825f;
+    public float movementMultiplier = 1.0f;
 
     [Header("Attacking")]
     [SerializeField] public bool southpaw = false;
@@ -50,16 +51,15 @@ public class PlayerMotionController : MonoBehaviour
     private void DoMotion(float vAxis, float hAxis)
     {
         Vector3 directionOfMotion = (playerTransform.forward * vAxis) + (playerTransform.right * hAxis);
-        // Not in an attack animation.
-        if (elapsedCooldown == 0)
-        {
-            this.rigidBody.AddForce(directionOfMotion.normalized * (movementSpeed), ForceMode.Force);
-        }
+        Vector3 force = directionOfMotion.normalized * (baseMovementSpeed * movementMultiplier); ;
+
         // In an attack animation.
-        else
+        if (elapsedCooldown != 0)
         {
-            this.rigidBody.AddForce(directionOfMotion.normalized * (movementSpeed * attackingMovementSpeedMultiplier), ForceMode.Force);
+            force *= attackingMovementSpeedMultiplier;
         }
+
+        this.rigidBody.AddForce(force, ForceMode.Force);
     }
 
     private void DoAttack()
