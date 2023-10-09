@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -175,6 +175,57 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!4 &304652242 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2914469392614503811, guid: a7a213b987c48ea4e8bdb18dc515f56f, type: 3}
+  m_PrefabInstance: {fileID: 1052882384108784327}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &304652243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304652239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dbc528ab4f27724d811dd01bc853448, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerTransform: {fileID: 304652242}
+  rigidBody: {fileID: 304652244}
+  jumpCode: 32
+  movementSpeed: 10
+  attackingMovementSpeedMultiplier: 0.825
+  southpaw: 0
+  attackCooldown: 0
+--- !u!54 &304652244
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304652239}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &318654820 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 175928, guid: 497b6e4d56b9a2d48ac2cd8de829fa88, type: 3}
@@ -866,7 +917,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bc9566f4ed190d45adc4bfa215cebe0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isoView: 0
+  isoView: 1
   camMoveSpeed: 0.5
   camTurnSpeed: 15
   camDistance: -5
@@ -3582,6 +3633,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1384966038825954243, guid: a7a213b987c48ea4e8bdb18dc515f56f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 304652240}
+    - targetCorrespondingSourceObject: {fileID: 1384966038825954243, guid: a7a213b987c48ea4e8bdb18dc515f56f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 304652244}
+    - targetCorrespondingSourceObject: {fileID: 1384966038825954243, guid: a7a213b987c48ea4e8bdb18dc515f56f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 304652243}
   m_SourcePrefab: {fileID: 100100000, guid: a7a213b987c48ea4e8bdb18dc515f56f, type: 3}
 --- !u!1001 &1070342481543881710
 PrefabInstance:
