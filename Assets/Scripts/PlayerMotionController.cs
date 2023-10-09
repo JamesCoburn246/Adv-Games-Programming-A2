@@ -26,6 +26,7 @@ public class NewBehaviourScript : MonoBehaviour
 
     // Player transform.
     Transform playerTransform;
+    Rigidbody rigidbody;
 
     // Start is called before the first frame update
     private void Start()
@@ -39,11 +40,30 @@ public class NewBehaviourScript : MonoBehaviour
         float vAxis = Input.GetAxis("Vertical");
         float hAxis = Input.GetAxis("Horizontal");
         bool attack = Input.GetMouseButton(southpaw ? 2 : 1);
-        
+        if (attack)
+        {
+            DoAttack();
+        }
+        DoMotion(vAxis, hAxis);
     }
 
-    private void Move(float vAxis, float hAxis)
+    private void DoMotion(float vAxis, float hAxis)
     {
-        Vector3 motionOffset = (playerTransform.forward * vAxis) + (playerTransform.right * hAxis);
+        Vector3 directionOfMotion = (playerTransform.forward * vAxis) + (playerTransform.right * hAxis);
+        // Not in an attack animation.
+        if (elapsedCooldown == 0)
+        {
+            this.rigidbody.AddForce(directionOfMotion.normalized * (movementSpeed), ForceMode.Force);
+        }
+        // In an attack animation.
+        else
+        {
+            this.rigidbody.AddForce(directionOfMotion.normalized * (movementSpeed * attackingMovementSpeedMultiplier), ForceMode.Force);
+        }
+    }
+
+    private void DoAttack()
+    {
+
     }
 }
