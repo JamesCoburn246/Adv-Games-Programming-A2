@@ -6,6 +6,9 @@ using UnityEngine.Serialization;
 
 public class CameraController : MonoBehaviour
 {
+    // singleton instance
+    public CameraController Instance { get; private set; }
+
     public Transform CameraPivot { get; private set; }
     public Camera MainCam { get; private set; }
 
@@ -38,6 +41,19 @@ public class CameraController : MonoBehaviour
     public float camIsoDistance = 5f;
 
     public float camIsoSmoothTime = 0.3f;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
