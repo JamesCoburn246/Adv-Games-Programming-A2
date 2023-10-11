@@ -53,7 +53,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         Inputs = InputManager.Instance;
         PlayerCam = CameraController.Instance;
@@ -68,7 +68,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         StateManager.LogicUpdate();
     }
