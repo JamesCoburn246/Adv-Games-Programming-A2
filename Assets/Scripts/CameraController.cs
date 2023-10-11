@@ -7,10 +7,10 @@ using UnityEngine.Serialization;
 public class CameraController : MonoBehaviour
 {
     // singleton instance
-    public CameraController Instance { get; private set; }
+    public static CameraController Instance { get; private set; }
 
-    public Transform CameraPivot { get; private set; }
-    public Camera MainCam { get; private set; }
+    private Transform _cameraPivot;
+    private Camera _mainCam;
 
     public bool isoView;
     
@@ -58,8 +58,8 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        CameraPivot = transform.GetChild(0);
-        MainCam = Camera.main;
+        _cameraPivot = transform.GetChild(0);
+        _mainCam = Camera.main;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -69,15 +69,15 @@ public class CameraController : MonoBehaviour
     {
         if (!isoView)
         {
-            if (MainCam.orthographic)
+            if (_mainCam.orthographic)
             {
                 // set orthographic to false
-                MainCam.orthographic = false;
+                _mainCam.orthographic = false;
                 // adjust the near and far clip planes
-                MainCam.nearClipPlane = 0.01f;
-                MainCam.farClipPlane = 1000f;
+                _mainCam.nearClipPlane = 0.01f;
+                _mainCam.farClipPlane = 1000f;
                 // set the right z-distance
-                MainCam.transform.localPosition = new Vector3(0, 0, camDistance);
+                _mainCam.transform.localPosition = new Vector3(0, 0, camDistance);
             }
             // rotation around the x-axis (i.e up-down)
             _targetRotX = Mathf.Clamp(_targetRotX-InputManager.Instance.LookInput.y * Time.deltaTime * camTurnSpeed, -10, 60);
@@ -88,15 +88,15 @@ public class CameraController : MonoBehaviour
         }
         else
         {
-            if (!MainCam.orthographic)
+            if (!_mainCam.orthographic)
             {
                 // set orthographic to true
-                MainCam.orthographic = true;
+                _mainCam.orthographic = true;
                 // adjust the near and far clip planes
-                MainCam.nearClipPlane = -100f;
-                MainCam.farClipPlane = 100f;
+                _mainCam.nearClipPlane = -100f;
+                _mainCam.farClipPlane = 100f;
                 // set the right z-distance
-                MainCam.orthographicSize = camIsoDistance;
+                _mainCam.orthographicSize = camIsoDistance;
             }
             // turn the cam if tab is pressed
             if (InputManager.Instance.TurnCamInput)
@@ -113,17 +113,22 @@ public class CameraController : MonoBehaviour
         if (!isoView)
         {
             // rotate the camera to the target rotation if using 3rd person view
-            CameraPivot.rotation = _targetRot;
-            // move camera to follow target position
-            CameraPivot.position = Vector3.SmoothDamp(CameraPivot.position, followTarget.position, ref _camVelocity, camMoveSpeed);
+            _cameraPivot.rotation = _targetRot;
+            // rotate the camera manager object only around the y-axis
+            transform.rotation = Quaternion.AngleAxis(_cameraPivot.transform.eulerAngles.y, Vector3.up);
+            // move camera manager object to follow target position
+            transform.position = Vector3.SmoothDamp(transform.position, followTarget.position, ref _camVelocity, camMoveSpeed);
         }
         else
         {
-            var smoothAngle = Mathf.SmoothDampAngle(CameraPivot.rotation.eulerAngles.y, _camAngles[_currCamIndex],
+            var smoothAngle = Mathf.SmoothDampAngle(transform.rotation.eulerAngles.y, _camAngles[_currCamIndex],
                 ref _camAngularVelocity, camIsoSmoothTime);
-            CameraPivot.rotation = Quaternion.Euler(35.264f, smoothAngle, 0);
-            // move camera to follow target position
-            CameraPivot.position = Vector3.SmoothDamp(CameraPivot.position, followTarget.position, ref _camVelocity, camMoveSpeed);
+            // rotate the camera pivot
+            _cameraPivot.rotation = Quaternion.Euler(35.264f, smoothAngle, 0);
+            // rotate the camera manager object only around the y-axis
+            transform.rotation = Quaternion.AngleAxis(smoothAngle, Vector3.up);
+            // move camera manager object to follow target position
+            transform.position = Vector3.SmoothDamp(transform.position, followTarget.position, ref _camVelocity, camMoveSpeed);
         }
 
     }

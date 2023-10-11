@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 7a30fa23982c2aa48a6d5f0644008cec
+guid: e432915a8198b5d4396e4ff45a019787
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -25,21 +25,21 @@ ModelImporter:
     importAnimatedCustomProperties: 0
     importConstraints: 0
     animationCompression: 3
-    animationRotationError: 0.25
-    animationPositionError: 0.25
-    animationScaleError: 0.25
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Idle#4
+      name: Land
       takeName: mixamo.com
       internalID: -203655887218126122
-      firstFrame: 0
-      lastFrame: 76
+      firstFrame: 8
+      lastFrame: 32
       wrapMode: 0
-      orientationOffsetY: 45
+      orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
