@@ -121,7 +121,7 @@ public class CameraController : MonoBehaviour
         }
         else
         {
-            var smoothAngle = Mathf.SmoothDampAngle(_cameraPivot.rotation.eulerAngles.y, _camAngles[_currCamIndex],
+            var smoothAngle = Mathf.SmoothDampAngle(transform.rotation.eulerAngles.y, _camAngles[_currCamIndex],
                 ref _camAngularVelocity, camIsoSmoothTime);
             // rotate the camera pivot
             _cameraPivot.rotation = Quaternion.Euler(35.264f, smoothAngle, 0);
