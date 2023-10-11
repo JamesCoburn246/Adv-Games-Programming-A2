@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StateManager
+public class PlayerStateManager
 {
     private static PlayerManager _player;
 
@@ -18,7 +18,7 @@ public class StateManager
 
     protected State CurrentState;
     
-    public StateManager()
+    public PlayerStateManager()
     {
         _inputs = InputManager.Instance;
         _player = PlayerManager.Instance;
@@ -30,7 +30,7 @@ public class StateManager
         CurrentState?.Enter();
     }
     
-    public StateManager(State initialState)
+    public PlayerStateManager(State initialState)
     {
         _inputs = InputManager.Instance;
         _player = PlayerManager.Instance;
@@ -59,9 +59,9 @@ public class StateManager
     
     public class State
     {
-        protected StateManager stateManager;
+        protected PlayerStateManager stateManager;
 
-        protected State(StateManager stateManager)
+        protected State(PlayerStateManager stateManager)
         {
             this.stateManager = stateManager;
         }
@@ -111,7 +111,7 @@ public class StateManager
             _player.Animator.ResetTrigger("Move");
         }
 
-        public MoveState(StateManager stateManager) : base(stateManager)
+        public MoveState(PlayerStateManager stateManager) : base(stateManager)
         {
         }
     }
@@ -146,7 +146,7 @@ public class StateManager
             _player.ResetAnimatorStateTime();
         }
 
-        public FallState(StateManager stateManager) : base(stateManager)
+        public FallState(PlayerStateManager stateManager) : base(stateManager)
         {
         }
     }
@@ -154,7 +154,7 @@ public class StateManager
     public class LandState : State
     {
         private float _inLandTime;
-        public LandState(StateManager stateManager) : base(stateManager) {}
+        public LandState(PlayerStateManager stateManager) : base(stateManager) {}
         
         public override void Enter()
         {
@@ -184,7 +184,7 @@ public class StateManager
     {
         private bool triggerCombo;
 
-        public AttackState(StateManager stateManager) : base(stateManager) { }
+        public AttackState(PlayerStateManager stateManager) : base(stateManager) { }
 
         public override void Enter()
         {

@@ -14,7 +14,7 @@ public class PlayerManager : MonoBehaviour
 
     public CameraController PlayerCam { get; private set; }
 
-    public StateManager StateManager { get; private set; }
+    public PlayerStateManager StateManager { get; private set; }
     
     // Controls
     [Header("Movement")]
@@ -59,7 +59,7 @@ public class PlayerManager : MonoBehaviour
         PlayerCam = CameraController.Instance;
         RigidBody = GetComponent<Rigidbody>();
         Animator = GetComponent<Animator>();
-        StateManager = new StateManager();
+        StateManager = new PlayerStateManager();
         // set a max velocity (12 m/s)
         // RigidBody.maxLinearVelocity = 12f;
         // set ground layers
