@@ -1,35 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
+// -------------------------- ENEMY STATE MANAGER ----------------------------
 public class EnemyStateManager
 {
-    protected EnemyManager enemy;
-    protected State CurrentState;
+    protected static PlayerManager player;
+    // public AttackState attackState;
+    public ChaseState chaseState;
+    public IdleState idleState;
 
     public PatrolState patrolState;
-    public IdleState idleState;
-    public ChaseState chaseState;
-    public AttackState attackState;
-    
+
     public EnemyStateManager(EnemyManager enemy)
     {
-        this.enemy = enemy;
-        patrolState = new PatrolState(this);
-        idleState = new IdleState(this);
-        chaseState = new ChaseState(this);
-        attackState = new AttackState(this);
+        player = PlayerManager.Instance;
+        patrolState = new PatrolState(this, enemy);
+        idleState = new IdleState(this, enemy);
+        chaseState = new ChaseState(this, enemy);
+        // attackState = new AttackState(this, enemy);
         CurrentState = patrolState;
         CurrentState?.Enter();
     }
-    
+
     public EnemyStateManager(State initialState)
     {
         CurrentState = initialState;
         CurrentState?.Enter();
     }
-    
+
+    public State CurrentState { get; private set; }
+
     public void LogicUpdate()
     {
         CurrentState?.Update();
@@ -46,222 +45,195 @@ public class EnemyStateManager
         CurrentState = newState;
         CurrentState?.Enter();
     }
-    
-    // Base State
-    
-    public class State
-    {
-        protected EnemyStateManager stateManager;
 
-        protected State(EnemyStateManager stateManager)
+    public bool CheckState(State stateToCheck)
+    {
+        return CurrentState == stateToCheck;
+    }
+
+    // -------------------------------- INNER BASE STATE CLASS ---------------------------------- //
+
+    public abstract class State
+    {
+        protected readonly EnemyManager enemy;
+        protected readonly EnemyStateManager stateManager;
+        protected float timePassed;
+
+        protected State(EnemyStateManager stateManager, EnemyManager enemy)
         {
             this.stateManager = stateManager;
+            this.enemy = enemy;
         }
-        
+
         // Enter is called when the state is first entered
-        public virtual void Enter() {}
+        public virtual void Enter()
+        {
+        }
 
         // Update is called once per frame
-        public virtual void Update() {}
-    
+        public virtual void Update()
+        {
+        }
+
         // FixedUpdate is called once per physics update
-        public virtual void FixedUpdate() {}
-    
+        public virtual void FixedUpdate()
+        {
+        }
+
         // Exit is called when the state is exited
-        public virtual void Exit() {}
+        public virtual void Exit()
+        {
+        }
     }
-    
-    // States
+
+    // ------------------------------ ALL THE DIFFERENT STATES ----------------------------------- //
 
     public class IdleState : State
     {
-        public IdleState(EnemyStateManager stateManager) : base(stateManager){}
+        public IdleState(EnemyStateManager stateManager, EnemyManager enemy) : base(stateManager, enemy)
+        {
+        }
 
         public override void Enter()
         {
-            stateManager.enemy.timePassed = stateManager.enemy.idleCooldownTime;
+            timePassed = enemy.idleCooldownTime;
         }
 
         public override void FixedUpdate()
         {
-            stateManager.enemy.timePassed -= Time.deltaTime;
-            
-            if (stateManager.enemy.timePassed <= 0)
-            {
-                stateManager.SwitchState(stateManager.patrolState);
-            }
-            // generate a ray from the enemy to the player
-            Ray ray = new Ray(stateManager.enemy.lookTransform.position, PlayerManager.Instance.lookTransform.position - stateManager.enemy.lookTransform.position);
-        
-            // check if the player is within the field of view
-            if (Mathf.Abs(Vector3.Angle(stateManager.enemy.lookTransform.forward, ray.direction)) <= 55.0f)
-            {
-                Debug.DrawRay(stateManager.enemy.lookTransform.position, PlayerManager.Instance.lookTransform.position - stateManager.enemy.lookTransform.position, Color.blue);
-                
-                // if it is, perform a raycast
-                if (Physics.Raycast(ray, out var hit, stateManager.enemy.detectionDistance)) {
-                    // Check whether the player is in the guard's line of sight
-                    if (hit.collider.CompareTag("PlayerHitbox"))
-                    {
-                        stateManager.SwitchState(stateManager.chaseState);
-                    }
-                }
-            
-            }
+            enemy.HandleRotation(false);
+            enemy.HandleMovement();
+
+            timePassed -= Time.deltaTime;
+
+            if (timePassed <= 0) stateManager.SwitchState(stateManager.patrolState);
+            // if the player is not within enemy's FOV, don't do anything
+            if (!enemy.IsPlayerInView()) return;
+            // if the player is not within detection range, don't do anything
+            if (!enemy.RayCastToPlayer(enemy.detectionDistance)) return;
+            // If the player is in the enemy's FOV, start chasing
+            if (enemy.rayHit.collider.gameObject.layer == LayerMask.NameToLayer("Player")) stateManager.SwitchState(stateManager.chaseState);
         }
-        
-        
     }
 
     public class PatrolState : State
     {
         private int _destPoint;
 
-        public PatrolState(EnemyStateManager stateManager) : base(stateManager)
+
+        public PatrolState(EnemyStateManager stateManager, EnemyManager enemy) : base(stateManager, enemy)
         {
         }
 
+
         public override void Enter()
         {
-            // stateManager.enemy.Agent.stoppingDistance = stateManager.enemy.stoppingDistance;
+            // enemy.Agent.stoppingDistance = enemy.stoppingDistance;
             GoToNextPoint();
         }
 
         public override void FixedUpdate()
         {
-            if (stateManager.enemy.Agent.remainingDistance < stateManager.enemy.Agent.stoppingDistance)
-            {
+            enemy.HandleRotation(false);
+            enemy.HandleMovement();
+
+            if (enemy.Agent.remainingDistance < enemy.Agent.stoppingDistance)
                 stateManager.SwitchState(stateManager.idleState);
-            }
-            // generate a ray from the enemy to the player
-            Ray ray = new Ray(stateManager.enemy.lookTransform.position, PlayerManager.Instance.lookTransform.position - stateManager.enemy.lookTransform.position);
-        
-            // check if the player is within the field of view
-            if (Mathf.Abs(Vector3.Angle(stateManager.enemy.lookTransform.forward, ray.direction)) <= 55.0f)
-            {
-                Debug.DrawRay(stateManager.enemy.lookTransform.position + Vector3.up, PlayerManager.Instance.lookTransform.position - stateManager.enemy.lookTransform.position, Color.blue);
-                // if it is, perform a raycast towards the player
-                if (Physics.Raycast(ray, out var hit, stateManager.enemy.detectionDistance)) {
-                    // If the player is in the guard's line of sight, start chasing
-                    if (hit.collider.CompareTag("PlayerHitbox")) stateManager.SwitchState(stateManager.chaseState);
-                }
-            
-            }
-        
+            // if the player is not within enemy's FOV, don't do anything
+            if (!enemy.IsPlayerInView()) return;
+            // if the player is not within detection range, don't do anything
+            if (!enemy.RayCastToPlayer(enemy.detectionDistance)) return;
+            // If the player is in the enemy's FOV, start chasing
+            if (enemy.rayHit.collider.gameObject.layer == LayerMask.NameToLayer("Player")) stateManager.SwitchState(stateManager.chaseState);
         }
-        
+
         private void GoToNextPoint()
         {
             // Returns if no points have been set up
-            if (stateManager.enemy.patrolPoints.Length == 0)
+            if (enemy.patrolPoints.Length == 0)
                 return;
 
             // Set the agent to go to the currently selected destination.
-            stateManager.enemy.Agent.SetDestination(stateManager.enemy.patrolPoints[_destPoint].position);
+            enemy.Agent.SetDestination(enemy.patrolPoints[_destPoint].position);
 
             // Choose the next point in the array as the destination,
             // cycling to the start if necessary.
-            _destPoint = (_destPoint + 1) % stateManager.enemy.patrolPoints.Length;
+            _destPoint = (_destPoint + 1) % enemy.patrolPoints.Length;
         }
-        
-        
     }
 
     public class ChaseState : State
     {
-        public ChaseState(EnemyStateManager stateManager) : base(stateManager) {}
+        public ChaseState(EnemyStateManager stateManager, EnemyManager enemy) : base(stateManager, enemy)
+        {
+        }
+
 
         public override void Enter()
         {
-            stateManager.enemy.isLockedOn = true;
-            stateManager.enemy.timePassed = stateManager.enemy.destCooldownTime;
+            timePassed = enemy.attackCooldownTime;
         }
 
         public override void FixedUpdate()
         {
-            stateManager.enemy.timePassed -= Time.deltaTime;
-            
-            if (stateManager.enemy.timePassed <= 0)
+            timePassed -= Time.deltaTime;
+            enemy.HandleRotation(true);
+            enemy.HandleMovement();
+            // set destination to player
+            enemy.SetDestinationToPlayer();
+            // perform a raycast towards the player 
+            if (enemy.RayCastToPlayer(enemy.detectionDistance))
+                // if the player is not within detection range, switch to the idle state
+                if (enemy.rayHit.collider.gameObject.layer != LayerMask.NameToLayer("Player"))
+                    stateManager.SwitchState(stateManager.idleState);
+            // if the player is within attacking range
+            if (Vector3.Distance(player.transform.position, enemy.transform.position) <= enemy.attackDistance &&
+                timePassed <= 0)
             {
-                stateManager.enemy.Agent.SetDestination(PlayerManager.Instance.transform.position);
-                stateManager.enemy.timePassed = stateManager.enemy.destCooldownTime;
+                enemy.Animator.SetTrigger("Attack");
+                timePassed = enemy.attackCooldownTime;
             }
-            
-            // generate a ray from the enemy to the player 
-            Ray ray = new Ray(stateManager.enemy.lookTransform.position, PlayerManager.Instance.lookTransform.position - stateManager.enemy.lookTransform.position);
-            Debug.DrawRay(stateManager.enemy.lookTransform.position + Vector3.up, PlayerManager.Instance.lookTransform.position - stateManager.enemy.lookTransform.position, Color.yellow);
-
-            // and perform a ray cast
-            if (Physics.Raycast(ray, out var hit, stateManager.enemy.detectionDistance)) {
-                // if the player is not within the detection radius, switch to the patrol state
-                if (!hit.collider.CompareTag("PlayerHitbox")) stateManager.SwitchState(stateManager.patrolState);
-            }
-
-            if (stateManager.enemy.Agent.remainingDistance < stateManager.enemy.Agent.stoppingDistance)
-            {
-                stateManager.SwitchState(stateManager.attackState);
-            }
-
-            
-        }
-
-        public override void Exit()
-        {
-            stateManager.enemy.isLockedOn = false;
         }
     }
 
-    public class AttackState : State
-    {
-        private float _attackCooldown;
-        
-        public AttackState(EnemyStateManager stateManager) : base(stateManager) {}
-
-        public override void Enter()
-        {
-            stateManager.enemy.Animator.SetTrigger("Attack");
-            stateManager.enemy.isLockedOn = true;
-            stateManager.enemy.timePassed = stateManager.enemy.attackCooldownTime;
-        }
-
-        public override void FixedUpdate()
-        {
-            stateManager.enemy.timePassed -= Time.deltaTime;
-            // if attack cooldown has passed
-            if (stateManager.enemy.timePassed <= 0)
-            {
-                if (Vector3.Distance(PlayerManager.Instance.transform.position, stateManager.enemy.transform.position) <= stateManager.enemy.attackDistance)
-                {
-                    stateManager.SwitchState(stateManager.attackState);
-                }
-                else
-                {
-                    // generate a ray from the enemy to the player
-                    Ray ray = new Ray(stateManager.enemy.lookTransform.position, PlayerManager.Instance.lookTransform.position - stateManager.enemy.lookTransform.position);
-                    if (!Physics.Raycast(ray, out var hit, stateManager.enemy.detectionDistance)) stateManager.SwitchState(stateManager.idleState);
-                    Debug.DrawRay(stateManager.enemy.lookTransform.position + Vector3.up, PlayerManager.Instance.lookTransform.position - stateManager.enemy.lookTransform.position, Color.red);
-
-                    if (hit.collider.CompareTag("PlayerHitbox"))
-                    {
-                        stateManager.SwitchState(stateManager.chaseState);
-                    }
-                    else
-                    {
-                        stateManager.SwitchState(stateManager.patrolState);
-                    }
-
-                }
-            }
-        }
-
-
-        public override void Exit()
-        {
-            stateManager.enemy.isLockedOn = false;
-            stateManager.enemy.Animator.ResetTrigger("Attack");
-        }
-    }
-    
-    
-
+    // public class AttackState : State
+    // {
+    //     public AttackState(EnemyStateManager stateManager, EnemyManager enemy) : base(stateManager, enemy)
+    //     {
+    //     }
+    //
+    //
+    //     public override void Enter()
+    //     {
+    //         enemy.Animator.SetTrigger("Attack");
+    //     }
+    //
+    //     public override void FixedUpdate()
+    //     {
+    //         enemy.HandleRotation(false);
+    //         enemy.HandleMovement();
+    //         enemy.SetDestinationToPlayer();
+    //
+    //         timePassed -= Time.deltaTime;
+    //         // if the player is within attack range 
+    //         if (enemy.Agent.remainingDistance < enemy.Agent.stoppingDistance)
+    //         {
+    //             if (timePassed <= 0)
+    //             {
+    //                 timePassed = enemy.attackCooldownTime;
+    //                 stateManager.SwitchState(stateManager.attackState);
+    //             }
+    //         }
+    //         else
+    //         {
+    //             stateManager.SwitchState(stateManager.chaseState);
+    //         }
+    //     }
+    //
+    //
+    //     public override void Exit()
+    //     {
+    //         enemy.Animator.ResetTrigger("Attack");
+    //     }
+    // }
 }

@@ -430,6 +430,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4248600af6b9f064b8ae80e394491878, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lookTransform: {fileID: 0}
   moveSpeed: 0
   walkSpeed: 2.5
   sprintSpeed: 6.5
@@ -915,7 +916,7 @@ Transform:
   m_GameObject: {fileID: 3151295625968655445}
   serializedVersion: 2
   m_LocalRotation: {x: 0.000000029802319, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.6635883, z: 0.11788257}
+  m_LocalPosition: {x: 0, y: 1.6635883, z: 0.02}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

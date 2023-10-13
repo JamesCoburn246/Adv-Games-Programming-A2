@@ -7,31 +7,36 @@ using UnityEngine.Serialization;
 
 public class EnemyManager : MonoBehaviour
 {
-    public WeaponManager Weapon { get; private set; }
+    private WeaponManager Weapon { get; set; }
     public NavMeshAgent Agent { get; private set; }
     public Animator Animator { get; private set; }
-    public EnemyStateManager StateManager { get; private set; }
+    private EnemyStateManager StateManager { get; set; }
+
+    private static PlayerManager Player { get; set; }
 
     public Transform lookTransform;
+
+    public LayerMask enemyExcludeMask;
+    private Ray _rayToPlayer;
+    public RaycastHit rayHit;
+    public float fieldOfView = 55.0f;
     
     [Header("Movement")]
     public float moveSpeed;
     public float walkSpeed = 2.5f;
     public float sprintSpeed = 6.5f;
-    [FormerlySerializedAs("isChasing")] public bool isLockedOn;
 
     [Header("AI Settings")] 
     public Transform[] patrolPoints;
 
-    public float timePassed;
-    [FormerlySerializedAs("idleTime")] public float idleCooldownTime = 5f;
-    public float destCooldownTime = 0.2f;
-    public float attackCooldownTime = 2f;
-    public float detectionDistance = 10f;
-    public float attackDistance = 1f;
-    public float stoppingDistance = 0.5f;
+    public float attackDistance = 1.5f;
+    public float detectionDistance = 7.5f;
 
-    
+    private float _timePassed;
+    public float idleCooldownTime = 5f;
+    public float destCooldownTime = 0.1f;
+    public float attackCooldownTime = 3f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,12 +44,13 @@ public class EnemyManager : MonoBehaviour
         Agent = GetComponent<NavMeshAgent>();
         Animator = GetComponent<Animator>();
         StateManager = new EnemyStateManager(this);
+        Player = PlayerManager.Instance;
         lookTransform = transform.GetChild(0);
-        //
+        enemyExcludeMask = ~LayerMask.GetMask("Enemy");
         Agent.updateRotation = false;
-        // Agent.autoBraking = false;
-        isLockedOn = false;
         Agent.speed = walkSpeed;
+        Agent.stoppingDistance = attackDistance;
+        _timePassed = destCooldownTime;
     }
 
     // Update is called once per frame
@@ -55,12 +61,11 @@ public class EnemyManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        HandleRotation();
-        HandleMovement();
+        _timePassed -= Time.deltaTime;
         StateManager.PhysicsUpdate();
     }
     
-    public void HandleRotation()
+    public void HandleRotation(bool isLockedOn)
     {
         Vector3 targetDirection;
         if (!isLockedOn)
@@ -73,22 +78,24 @@ public class EnemyManager : MonoBehaviour
         else
         {
             // calculate agent direction based on player's position
-            targetDirection = PlayerManager.Instance.transform.position - transform.position;
+            targetDirection = (Player.transform.position - transform.position).normalized;
+            // set rotation to face forward if agent is idle
+            // if (targetDirection == Vector3.zero) targetDirection = transform.forward;
         }
         // set and smooth the rotation
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
-        Quaternion smoothRotation = Quaternion.Slerp(transform.rotation, targetRotation, 15 * Time.deltaTime);
+        Quaternion smoothRotation = Quaternion.Slerp(transform.rotation, targetRotation, 10 * Time.deltaTime);
         // rotate the agent
         transform.rotation = smoothRotation;
     }
 
     public void HandleMovement()
     {
-        moveSpeed = isLockedOn ? sprintSpeed : walkSpeed;
+        moveSpeed = StateManager.CurrentState == StateManager.chaseState ? sprintSpeed : walkSpeed;
         Agent.speed = moveSpeed;
         // snap animation motion speeds for better animation
-        var horizontal = isLockedOn ? Agent.velocity.normalized.x : Agent.velocity.normalized.x / 2; 
-        var vertical = isLockedOn ? Agent.velocity.normalized.z : Agent.velocity.normalized.z / 2;
+        var horizontal = StateManager.CheckState(StateManager.chaseState) ? Agent.velocity.normalized.x : Agent.velocity.normalized.x / 2; 
+        var vertical = StateManager.CheckState(StateManager.chaseState) ? Agent.velocity.normalized.z : Agent.velocity.normalized.z / 2;
         horizontal = horizontal switch
         {
             > 0 and < 0.55f => 0.5f,
@@ -108,6 +115,29 @@ public class EnemyManager : MonoBehaviour
         Animator.SetFloat("Horizontal", horizontal, 0.1f, Time.deltaTime);
         Animator.SetFloat("Vertical", vertical, 0.1f, Time.deltaTime);
     }
+
+    public bool IsPlayerInView()
+    {
+        _rayToPlayer = new Ray(lookTransform.position,Player.lookTransform.position - lookTransform.position);
+        return Mathf.Abs(Vector3.Angle(lookTransform.forward, _rayToPlayer.direction)) <= fieldOfView;
+    }
+
+    public bool RayCastToPlayer(float maxDistance)
+    {
+        _rayToPlayer = new Ray(lookTransform.position,Player.lookTransform.position - lookTransform.position);
+        return Physics.Raycast(_rayToPlayer, out rayHit, maxDistance, enemyExcludeMask);
+    }
+
+    public void SetDestinationToPlayer()
+    {
+        if (_timePassed <= 0)
+        {
+            Agent.SetDestination(Player.transform.position);
+            _timePassed = destCooldownTime;
+        }
+    }
+    
+    
     
     // Animation Events
     
@@ -119,5 +149,30 @@ public class EnemyManager : MonoBehaviour
     public void DisableDamage()
     {
         Weapon.DisableDamage();
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        if (lookTransform != null)
+        {
+            Gizmos.DrawRay(lookTransform.position, _rayToPlayer.direction.normalized * detectionDistance);
+        }
+
+        if (StateManager != null && StateManager.CheckState(StateManager.idleState))
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(transform.position, 0.5f);
+        }
+        if (StateManager != null && StateManager.CheckState(StateManager.patrolState))
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(transform.position, 0.5f);
+        }
+        if (StateManager != null && StateManager.CheckState(StateManager.chaseState))
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(transform.position, 0.5f);
+        }
     }
 }
