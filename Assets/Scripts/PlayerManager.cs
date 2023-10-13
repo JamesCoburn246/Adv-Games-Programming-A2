@@ -16,6 +16,8 @@ public class PlayerManager : MonoBehaviour
     public CameraController PlayerCam { get; private set; }
 
     public PlayerStateManager StateManager { get; private set; }
+
+    public Transform lookTransform;
     
     // Controls
     [Header("Movement")]
@@ -63,6 +65,7 @@ public class PlayerManager : MonoBehaviour
         StateManager = new PlayerStateManager();
         Weapon = GetComponentInChildren<WeaponManager>();
         Weapon.SetDamage(5);
+        lookTransform = transform.GetChild(0);
         // set a max velocity (12 m/s)
         // RigidBody.maxLinearVelocity = 12f;
         // set ground layers

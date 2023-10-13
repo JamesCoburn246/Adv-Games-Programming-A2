@@ -58,6 +58,7 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        followTarget = GameObject.FindWithTag("FollowTarget").transform;
         _cameraPivot = transform.GetChild(0);
         _mainCam = Camera.main;
         Cursor.lockState = CursorLockMode.Locked;
