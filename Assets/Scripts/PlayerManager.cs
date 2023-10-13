@@ -9,12 +9,15 @@ public class PlayerManager : MonoBehaviour
     // Components
     public static PlayerManager Instance { get; private set; }
     public InputManager Inputs { get; private set; }
+    public WeaponManager Weapon { get; private set; }
     public Rigidbody RigidBody { get; private set; }
     public Animator Animator { get; private set; }
 
     public CameraController PlayerCam { get; private set; }
 
     public PlayerStateManager StateManager { get; private set; }
+
+    public Transform lookTransform;
     
     // Controls
     [Header("Movement")]
@@ -60,6 +63,9 @@ public class PlayerManager : MonoBehaviour
         RigidBody = GetComponent<Rigidbody>();
         Animator = GetComponent<Animator>();
         StateManager = new PlayerStateManager();
+        Weapon = GetComponentInChildren<WeaponManager>();
+        Weapon.SetDamage(5);
+        lookTransform = transform.GetChild(0);
         // set a max velocity (12 m/s)
         // RigidBody.maxLinearVelocity = 12f;
         // set ground layers
@@ -166,5 +172,17 @@ public class PlayerManager : MonoBehaviour
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - groundedOffset, transform.position.z), 0.25f);
+    }
+    
+    // Animation Events
+    
+    public void EnableDamage()
+    {
+        Weapon.EnableDamage();
+    }
+
+    public void DisableDamage()
+    {
+        Weapon.DisableDamage();
     }
 }
