@@ -41,10 +41,16 @@ public class PlayerHealth : MonoBehaviour
         _healthSlider = healthBar.GetComponent<Slider>();
         _armourSlider = armourBar.GetComponent<Slider>();
 
-        _healthSlider.maxValue = maximumHealth;
-        _armourSlider.maxValue = maximumArmour;
-        _healthSlider.minValue = 0;
-        _armourSlider.minValue = 0;
+        if (_healthSlider == null || _armourSlider == null)
+        {
+            Debug.Log("Check PlayerHealth.cs in the inspector. Null reference occurred.");
+        } else
+        {
+            _healthSlider.maxValue = maximumHealth;
+            _armourSlider.maxValue = maximumArmour;
+            _healthSlider.minValue = 0;
+            _armourSlider.minValue = 0;
+        }
     }
 
     private void Update()

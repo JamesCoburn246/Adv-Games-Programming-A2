@@ -41,10 +41,16 @@ public class PlayerEnergy : MonoBehaviour
         _manaSlider = manaBar.GetComponent<Slider>();
         _staminaSlider = staminaBar.GetComponent<Slider>();
 
-        _manaSlider.maxValue = maximumMana;
-        _staminaSlider.maxValue = maximumStamina;
-        _manaSlider.minValue = 0;
-        _staminaSlider.minValue = 0;
+        if (_manaSlider == null || _staminaSlider == null)
+        {
+            Debug.Log("Check PlayerEnergy.cs in the inspector. Null reference occurred.");
+        } else
+        {
+            _manaSlider.maxValue = maximumMana;
+            _staminaSlider.maxValue = maximumStamina;
+            _manaSlider.minValue = 0;
+            _staminaSlider.minValue = 0;
+        }
     }
 
    
