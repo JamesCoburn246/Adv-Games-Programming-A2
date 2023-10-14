@@ -49,11 +49,11 @@ public class WeaponManager : MonoBehaviour
             if (other.CompareTag("EnemyHitbox"))
             {
                 Debug.Log("Hit Enemy!");
-                // EnemyStats enemyStats = other.GetComponentInParent<EnemyStats>();
-                // if (enemyStats != null)
-                // {
-                //     enemyStats.TakeDamage(weaponDamage);
-                // }
+                EnemyStats enemyStats = other.GetComponentInParent<EnemyStats>();
+                if (enemyStats != null)
+                {
+                    enemyStats.DepleteHealth(weaponDamage);
+                }
             } 
         }
     }

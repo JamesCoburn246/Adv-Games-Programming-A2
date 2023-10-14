@@ -437,8 +437,6 @@ MonoBehaviour:
   sprintSpeed: 6.5
   fallingSpeed: 30
   inAirTime: 0
-  movementMultiplier: 1
-  isGrounded: 0
   groundedOffset: -0.425
 --- !u!114 &517852181284785439
 MonoBehaviour:
@@ -919,7 +917,7 @@ GameObject:
   - component: {fileID: 8853770010310117205}
   m_Layer: 0
   m_Name: LookPosition
-  m_TagString: FollowTarget
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1076,7 +1074,7 @@ GameObject:
   - component: {fileID: 5303241692394655887}
   m_Layer: 0
   m_Name: Spine_03
-  m_TagString: Untagged
+  m_TagString: FollowTarget
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

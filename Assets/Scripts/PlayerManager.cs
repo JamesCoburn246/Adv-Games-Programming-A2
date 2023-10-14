@@ -71,7 +71,7 @@ public class PlayerManager : MonoBehaviour
         StateManager = new PlayerStateManager();
         Stats = GetComponent<PlayerStats>();
         Weapon = GetComponentInChildren<WeaponManager>();
-        Weapon.SetDamage(5);
+        Weapon.SetDamage(10);
         lookTransform = transform.GetChild(0);
         _groundLayers = LayerMask.GetMask("Environment");
 

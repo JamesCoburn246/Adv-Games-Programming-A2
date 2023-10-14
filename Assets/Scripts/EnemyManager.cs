@@ -41,7 +41,7 @@ public class EnemyManager : MonoBehaviour
     void Start()
     {
         Weapon = GetComponentInChildren<WeaponManager>();
-        Weapon.SetDamage(10);
+        Weapon.SetDamage(5);
         Agent = GetComponent<NavMeshAgent>();
         Animator = GetComponent<Animator>();
         StateManager = new EnemyStateManager(this);
