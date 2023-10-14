@@ -99,12 +99,12 @@ public class PlayerStateManager
             player.HandleMovement();
             DepleteStamina();
             // handle switching
-            if (!player.isGrounded)
+            if (!player.IsGrounded)
             {
                 stateManager.SwitchState(stateManager.fallState);
             }
 
-            if (inputs.AttackInput)
+            if (player.IsAttacking)
             {
                 stateManager.SwitchState(stateManager.attackState);
             }
@@ -112,7 +112,7 @@ public class PlayerStateManager
 
         private void DepleteStamina()
         {
-            if (inputs.SprintInput && !_depleteStaminaLock)
+            if (player.IsSprinting && !_depleteStaminaLock)
             {
                 _depleteStaminaLock = true;
                 player.StartCoroutine(DepleteStaminaTask());
@@ -157,7 +157,7 @@ public class PlayerStateManager
             player.HandleRotation();
             player.HandleMovement();
             
-            if (!player.isGrounded)
+            if (!player.IsGrounded)
             {
                 player.RigidBody.AddForce(player.fallingSpeed * player.inAirTime * -Vector3.up);
                 player.inAirTime += Time.deltaTime * 2;
@@ -218,11 +218,13 @@ public class PlayerStateManager
         {
             player.Animator.applyRootMotion = true;
             triggerCombo = false;
+            player.RigidBody.velocity = Vector3.zero;
             player.Animator.SetTrigger("Attack");
         }
 
         public override void FixedUpdate()
         {
+            player.GroundedCheck();
             if (player.IsAnimatorTransitioning) return;
             switch (player.AnimatorStateTime)
             {

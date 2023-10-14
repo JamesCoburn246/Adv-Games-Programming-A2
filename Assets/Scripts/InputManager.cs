@@ -11,7 +11,7 @@ public class InputManager : MonoBehaviour
     
     public bool SprintInput { get; private set; }
 
-    public bool AttackInput { get; set; }
+    public bool AttackInput { get; private set; }
 
     public bool TurnCamInput { get; set; }
 
@@ -36,6 +36,10 @@ public class InputManager : MonoBehaviour
         SprintInput = Input.GetKey(KeyCode.Space);
         // get attack input
         AttackInput = Input.GetMouseButton(0);
+        // get look input
+        LookInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+        // get turn cam input
+        TurnCamInput = Input.GetKeyDown(KeyCode.Tab);
     }
 
     public void OnMove(InputValue value)
@@ -45,13 +49,13 @@ public class InputManager : MonoBehaviour
     
     public void OnLook(InputValue value)
     {
-        LookInput = value.Get<Vector2>();
+        // LookInput = value.Get<Vector2>();
     }
 
     public void OnTurnCam(InputValue value)
     {
-        TurnCamInput = value.isPressed;
-        Debug.Log(value.Get());
-        Debug.Log(value.isPressed);
+        // TurnCamInput = value.isPressed;
+        // Debug.Log(value.Get());
+        // Debug.Log(value.isPressed);
     }
 }

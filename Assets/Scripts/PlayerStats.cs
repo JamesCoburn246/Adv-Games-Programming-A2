@@ -42,12 +42,21 @@ public class PlayerStats : MonoBehaviour
         ReplenishStamina();
 
     }
+    
+    // --------------- Health Stuff ------------------- //
 
     public void DepleteHealth(float value)
     {
         _currentHealth -= value;
         _currentHealth = Mathf.Clamp(_currentHealth, 0, maxHealth);
         healthIndicator.SetCurrentHealth(_currentHealth);
+    }
+    
+    // --------------- Stamina Stuff ------------------- //
+
+    public bool CheckStamina()
+    {
+        return _currentStamina > 0;
     }
 
     private void IncreaseStamina(float value)
@@ -86,11 +95,5 @@ public class PlayerStats : MonoBehaviour
         IncreaseStamina(25);
         // release the lock because the coroutine has ended
         _staminaReplenishLock = false;
-    }
-    
-
-    public void Die()
-    {
-        // Destroy(gameObject);
     }
 }
