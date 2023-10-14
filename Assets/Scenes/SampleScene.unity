@@ -123,11 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!4 &50511840 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4325476903405157695, guid: a7a213b987c48ea4e8bdb18dc515f56f, type: 3}
-  m_PrefabInstance: {fileID: 490048177}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &64191772
 GameObject:
   m_ObjectHideFlags: 0
@@ -4153,11 +4148,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bc9566f4ed190d45adc4bfa215cebe0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isoView: 1
-  camMoveSpeed: 0.5
-  camTurnSpeed: 15
-  camDistance: -5
-  followTarget: {fileID: 50511840}
+  isoView: 0
+  camMoveSpeed: 0.3
+  camTurnSpeed: 1.5
+  camDistance: -7.5
+  followTarget: {fileID: 0}
   camIsoDistance: 7
   camIsoSmoothTime: 0.3
 --- !u!1 &2090604580 stripped
