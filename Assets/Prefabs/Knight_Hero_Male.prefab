@@ -321,6 +321,7 @@ GameObject:
   - component: {fileID: -946083877334284277}
   - component: {fileID: -9185480153770857326}
   - component: {fileID: 4166757640795800848}
+  - component: {fileID: 517852181284785439}
   m_Layer: 0
   m_Name: Knight_Hero_Male
   m_TagString: Untagged
@@ -439,6 +440,22 @@ MonoBehaviour:
   movementMultiplier: 1
   isGrounded: 0
   groundedOffset: -0.425
+--- !u!114 &517852181284785439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1384966038825954243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 658f9fb62bfc68640a046b11800b11ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  maxStamina: 100
+  healthIndicator: {fileID: 0}
+  staminaIndicator: {fileID: 0}
 --- !u!1 &1387131905037168719
 GameObject:
   m_ObjectHideFlags: 0

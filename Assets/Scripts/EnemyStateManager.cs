@@ -99,7 +99,7 @@ public class EnemyStateManager
             timePassed = enemy.idleCooldownTime;
         }
 
-        public override void FixedUpdate()
+        public override void Update()
         {
             enemy.HandleRotation(false);
             enemy.HandleMovement();
@@ -132,7 +132,7 @@ public class EnemyStateManager
             GoToNextPoint();
         }
 
-        public override void FixedUpdate()
+        public override void Update()
         {
             enemy.HandleRotation(false);
             enemy.HandleMovement();
@@ -174,7 +174,7 @@ public class EnemyStateManager
             timePassed = enemy.attackCooldownTime;
         }
 
-        public override void FixedUpdate()
+        public override void Update()
         {
             timePassed -= Time.deltaTime;
             enemy.HandleRotation(true);

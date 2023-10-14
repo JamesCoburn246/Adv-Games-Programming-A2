@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerStateManager
@@ -83,9 +84,12 @@ public class PlayerStateManager
     
     public class MoveState : State
     {
+        private bool _depleteStaminaLock;
+        
         public override void Enter()
         {
             player.Animator.SetTrigger("Move");
+            _depleteStaminaLock = false;
         }
         
         public override void FixedUpdate()
@@ -93,6 +97,7 @@ public class PlayerStateManager
             player.GroundedCheck();
             player.HandleRotation();
             player.HandleMovement();
+            DepleteStamina();
             // handle switching
             if (!player.isGrounded)
             {
@@ -103,6 +108,29 @@ public class PlayerStateManager
             {
                 stateManager.SwitchState(stateManager.attackState);
             }
+        }
+
+        private void DepleteStamina()
+        {
+            if (inputs.SprintInput && !_depleteStaminaLock)
+            {
+                _depleteStaminaLock = true;
+                player.StartCoroutine(DepleteStaminaTask());
+            }
+            else
+            {
+                player.StopCoroutine(DepleteStaminaTask());
+            }
+        }
+
+        private IEnumerator<WaitForSeconds> DepleteStaminaTask()
+        {
+            // reduce stamina by 1 point
+            player.Stats.DepleteStamina(1.0f);
+            // then wait for 1/10 of a second
+            yield return new WaitForSeconds(0.1f);
+            // release the lock because the coroutine has ended
+            _depleteStaminaLock = false;
         }
 
         public override void Exit()

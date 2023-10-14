@@ -10,6 +10,8 @@ public class PlayerManager : MonoBehaviour
     public static PlayerManager Instance { get; private set; }
     public InputManager Inputs { get; private set; }
     public WeaponManager Weapon { get; private set; }
+
+    public PlayerStats Stats { get; private set; }
     public Rigidbody RigidBody { get; private set; }
     public Animator Animator { get; private set; }
 
@@ -26,7 +28,6 @@ public class PlayerManager : MonoBehaviour
     public float sprintSpeed = 6.5f;
     public float fallingSpeed = 30f;
     public float inAirTime;
-    public float movementMultiplier = 1.0f;
     
     // Grounded Checks
     public bool isGrounded;
@@ -63,12 +64,10 @@ public class PlayerManager : MonoBehaviour
         RigidBody = GetComponent<Rigidbody>();
         Animator = GetComponent<Animator>();
         StateManager = new PlayerStateManager();
+        Stats = GetComponent<PlayerStats>();
         Weapon = GetComponentInChildren<WeaponManager>();
         Weapon.SetDamage(5);
         lookTransform = transform.GetChild(0);
-        // set a max velocity (12 m/s)
-        // RigidBody.maxLinearVelocity = 12f;
-        // set ground layers
         _groundLayers = LayerMask.GetMask("Environment");
 
     }
@@ -185,4 +184,5 @@ public class PlayerManager : MonoBehaviour
     {
         Weapon.DisableDamage();
     }
+
 }

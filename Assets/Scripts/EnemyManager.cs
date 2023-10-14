@@ -41,6 +41,7 @@ public class EnemyManager : MonoBehaviour
     void Start()
     {
         Weapon = GetComponentInChildren<WeaponManager>();
+        Weapon.SetDamage(10);
         Agent = GetComponent<NavMeshAgent>();
         Animator = GetComponent<Animator>();
         StateManager = new EnemyStateManager(this);
@@ -56,12 +57,12 @@ public class EnemyManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        _timePassed -= Time.deltaTime;
         StateManager.LogicUpdate();
     }
 
     private void FixedUpdate()
     {
-        _timePassed -= Time.deltaTime;
         StateManager.PhysicsUpdate();
     }
     
@@ -130,11 +131,9 @@ public class EnemyManager : MonoBehaviour
 
     public void SetDestinationToPlayer()
     {
-        if (_timePassed <= 0)
-        {
-            Agent.SetDestination(Player.transform.position);
-            _timePassed = destCooldownTime;
-        }
+        if (!(_timePassed <= 0)) return;
+        Agent.SetDestination(Player.transform.position);
+        _timePassed = destCooldownTime;
     }
     
     
