@@ -24,14 +24,13 @@ public class HealthIndicator : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
     {
         _healthSlider = GetComponentInChildren<Slider>();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         _healthSlider.value = Mathf.MoveTowards(_healthSlider.value, _targetValue, 15 * Time.deltaTime);
     }

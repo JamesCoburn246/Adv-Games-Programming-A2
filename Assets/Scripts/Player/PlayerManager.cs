@@ -94,7 +94,7 @@ public class PlayerManager : MonoBehaviour
     {
         Movement = Inputs.MoveInput;
         IsAttacking = Inputs.AttackInput;
-        IsSprinting = Inputs.SprintInput && Stats.CheckStamina();
+        IsSprinting = Inputs.SprintInput && Stats.HasStamina();
     }
 
     public void HandleRotation()

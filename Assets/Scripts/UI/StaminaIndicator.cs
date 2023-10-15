@@ -25,14 +25,13 @@ public class StaminaIndicator : MonoBehaviour
 
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
     {
         _staminaSlider = GetComponentInChildren<Slider>();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         _staminaSlider.value = Mathf.MoveTowards(_staminaSlider.value, _targetValue, 15 * Time.deltaTime);
     }

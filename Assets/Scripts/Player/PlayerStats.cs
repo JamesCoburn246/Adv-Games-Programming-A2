@@ -54,7 +54,7 @@ public class PlayerStats : MonoBehaviour
     
     // --------------- Stamina Stuff ------------------- //
 
-    public bool CheckStamina()
+    public bool HasStamina()
     {
         return _currentStamina > 0;
     }
