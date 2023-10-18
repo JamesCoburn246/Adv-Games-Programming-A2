@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerStateManager
 {
-    private static PlayerManager _player;
+    protected static PlayerManager player;
 
-    private static InputManager _inputs;
+    protected static InputManager inputs;
 
     public MoveState moveState { get; private set; }
     public FallState fallState { get; private set; }
@@ -20,8 +21,8 @@ public class PlayerStateManager
     
     public PlayerStateManager()
     {
-        _inputs = InputManager.Instance;
-        _player = PlayerManager.Instance;
+        inputs = InputManager.Instance;
+        player = PlayerManager.Instance;
         moveState = new MoveState(this);
         fallState = new FallState(this);
         landState = new LandState(this);
@@ -32,8 +33,8 @@ public class PlayerStateManager
     
     public PlayerStateManager(State initialState)
     {
-        _inputs = InputManager.Instance;
-        _player = PlayerManager.Instance;
+        inputs = InputManager.Instance;
+        player = PlayerManager.Instance;
         CurrentState = initialState;
         CurrentState?.Enter();
     }
@@ -83,32 +84,59 @@ public class PlayerStateManager
     
     public class MoveState : State
     {
+        private bool _depleteStaminaLock;
+        
         public override void Enter()
         {
-            _player.Animator.SetTrigger("Move");
+            player.Animator.SetTrigger("Move");
+            _depleteStaminaLock = false;
         }
         
         public override void FixedUpdate()
         {
-            _player.GroundedCheck();
-            _player.HandleRotation();
-            _player.HandleMovement();
+            player.GroundedCheck();
+            player.HandleRotation();
+            player.HandleMovement();
+            DepleteStamina();
             // handle switching
-            if (!_player.isGrounded)
+            if (!player.IsGrounded)
             {
                 stateManager.SwitchState(stateManager.fallState);
             }
 
-            if (_inputs.AttackInput)
+            if (player.IsAttacking)
             {
                 stateManager.SwitchState(stateManager.attackState);
             }
         }
 
+        private void DepleteStamina()
+        {
+            if (player.IsSprinting && !_depleteStaminaLock)
+            {
+                _depleteStaminaLock = true;
+                player.StartCoroutine(DepleteStaminaTask());
+            }
+            else
+            {
+                player.StopCoroutine(DepleteStaminaTask());
+            }
+        }
+
+        private IEnumerator<WaitForSeconds> DepleteStaminaTask()
+        {
+            // reduce stamina by 1 point
+            player.Stats.DepleteStamina(1.0f);
+            // then wait for 1/10 of a second
+            yield return new WaitForSeconds(0.1f);
+            // release the lock because the coroutine has ended
+            _depleteStaminaLock = false;
+        }
+
         public override void Exit()
         {
-            _player.ResetAnimatorStateTime();
-            _player.Animator.ResetTrigger("Move");
+            player.ResetAnimatorStateTime();
+            player.Animator.ResetTrigger("Move");
         }
 
         public MoveState(PlayerStateManager stateManager) : base(stateManager)
@@ -120,19 +148,19 @@ public class PlayerStateManager
     {
         public override void Enter()
         {
-            _player.Animator.SetTrigger("Fall");
+            player.Animator.SetTrigger("Fall");
         }
 
         public override void FixedUpdate()
         {
-            _player.GroundedCheck();
-            _player.HandleRotation();
-            _player.HandleMovement();
+            player.GroundedCheck();
+            player.HandleRotation();
+            player.HandleMovement();
             
-            if (!_player.isGrounded)
+            if (!player.IsGrounded)
             {
-                _player.RigidBody.AddForce(_player.fallingSpeed * _player.inAirTime * -Vector3.up);
-                _player.inAirTime += Time.deltaTime * 2;
+                player.RigidBody.AddForce(player.fallingSpeed * player.inAirTime * -Vector3.up);
+                player.inAirTime += Time.deltaTime * 2;
             }
             else
             {
@@ -142,8 +170,8 @@ public class PlayerStateManager
 
         public override void Exit()
         {
-            _player.Animator.ResetTrigger("Fall");
-            _player.ResetAnimatorStateTime();
+            player.Animator.ResetTrigger("Fall");
+            player.ResetAnimatorStateTime();
         }
 
         public FallState(PlayerStateManager stateManager) : base(stateManager)
@@ -159,14 +187,14 @@ public class PlayerStateManager
         public override void Enter()
         {
             // _inLandTime = 0;
-            _player.Animator.SetTrigger("Land");
+            player.Animator.SetTrigger("Land");
         }
 
         public override void FixedUpdate() 
         {
-            if (_player.IsAnimatorTransitioning) return;
+            if (player.IsAnimatorTransitioning) return;
             // _inLandTime += Time.deltaTime;
-            if (_player.AnimatorStateTime >= 0.5f)
+            if (player.AnimatorStateTime >= 0.5f)
             {
                 stateManager.SwitchState(stateManager.moveState);
             }
@@ -174,8 +202,8 @@ public class PlayerStateManager
 
         public override void Exit()
         {
-            _player.Animator.ResetTrigger("Land");
-            _player.ResetAnimatorStateTime();
+            player.Animator.ResetTrigger("Land");
+            player.ResetAnimatorStateTime();
             
         }
     }
@@ -188,17 +216,19 @@ public class PlayerStateManager
 
         public override void Enter()
         {
-            _player.Animator.applyRootMotion = true;
+            player.Animator.applyRootMotion = true;
             triggerCombo = false;
-            _player.Animator.SetTrigger("Attack");
+            player.RigidBody.velocity = Vector3.zero;
+            player.Animator.SetTrigger("Attack");
         }
 
         public override void FixedUpdate()
         {
-            if (_player.IsAnimatorTransitioning) return;
-            switch (_player.AnimatorStateTime)
+            player.GroundedCheck();
+            if (player.IsAnimatorTransitioning) return;
+            switch (player.AnimatorStateTime)
             {
-                case > 0.15f when _player.Inputs.AttackInput:
+                case > 0.15f when player.Inputs.AttackInput:
                     triggerCombo = true;
                     break;
                 case >= 0.8f when triggerCombo:
@@ -212,9 +242,9 @@ public class PlayerStateManager
 
         public override void Exit()
         {
-            _player.Animator.applyRootMotion = false;
-            _player.Animator.ResetTrigger("Attack");
-            _player.ResetAnimatorStateTime();
+            player.Animator.applyRootMotion = false;
+            player.Animator.ResetTrigger("Attack");
+            player.ResetAnimatorStateTime();
         }
     }
 

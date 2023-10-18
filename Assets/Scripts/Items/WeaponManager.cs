@@ -40,20 +40,20 @@ public class WeaponManager : MonoBehaviour
             if (other.CompareTag("PlayerHitbox"))
             {
                 Debug.Log("Hit Player!");
-                // PlayerStats playerStats = other.GetComponentInParent<PlayerStats>();
-                // if (playerStats != null)
-                // {
-                //     playerStats.TakeDamage(weaponDamage);
-                // }
+                PlayerStats playerStats = other.GetComponentInParent<PlayerStats>();
+                if (playerStats != null)
+                {
+                    playerStats.DepleteHealth(weaponDamage);
+                }
             } 
             if (other.CompareTag("EnemyHitbox"))
             {
                 Debug.Log("Hit Enemy!");
-                // EnemyStats enemyStats = other.GetComponentInParent<EnemyStats>();
-                // if (enemyStats != null)
-                // {
-                //     enemyStats.TakeDamage(weaponDamage);
-                // }
+                EnemyStats enemyStats = other.GetComponentInParent<EnemyStats>();
+                if (enemyStats != null)
+                {
+                    enemyStats.DepleteHealth(weaponDamage);
+                }
             } 
         }
     }

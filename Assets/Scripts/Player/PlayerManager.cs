@@ -10,13 +10,22 @@ public class PlayerManager : MonoBehaviour
     public static PlayerManager Instance { get; private set; }
     public InputManager Inputs { get; private set; }
     public WeaponManager Weapon { get; private set; }
+
+    public PlayerStats Stats { get; private set; }
     public Rigidbody RigidBody { get; private set; }
     public Animator Animator { get; private set; }
 
     public CameraController PlayerCam { get; private set; }
 
     public PlayerStateManager StateManager { get; private set; }
+
+    public Transform lookTransform;
     
+    // Inputs
+    public Vector3 Movement { get; private set; }
+    public bool IsAttacking { get; private set; }
+    public bool IsSprinting { get; private set; }
+
     // Controls
     [Header("Movement")]
     public float moveSpeed;
@@ -24,10 +33,9 @@ public class PlayerManager : MonoBehaviour
     public float sprintSpeed = 6.5f;
     public float fallingSpeed = 30f;
     public float inAirTime;
-    public float movementMultiplier = 1.0f;
     
     // Grounded Checks
-    public bool isGrounded;
+    public bool IsGrounded { get; private set; }
     public float groundedOffset = -0.30f; // should be between -0.3 and 0.4f 
     private LayerMask _groundLayers;
 
@@ -61,11 +69,10 @@ public class PlayerManager : MonoBehaviour
         RigidBody = GetComponent<Rigidbody>();
         Animator = GetComponent<Animator>();
         StateManager = new PlayerStateManager();
+        Stats = GetComponent<PlayerStats>();
         Weapon = GetComponentInChildren<WeaponManager>();
-        Weapon.SetDamage(5);
-        // set a max velocity (12 m/s)
-        // RigidBody.maxLinearVelocity = 12f;
-        // set ground layers
+        Weapon.SetDamage(10);
+        lookTransform = transform.GetChild(0);
         _groundLayers = LayerMask.GetMask("Environment");
 
     }
@@ -73,6 +80,7 @@ public class PlayerManager : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        HandleAllInputs();
         StateManager.LogicUpdate();
     }
 
@@ -82,11 +90,18 @@ public class PlayerManager : MonoBehaviour
         StateManager.PhysicsUpdate();
     }
 
+    private void HandleAllInputs()
+    {
+        Movement = Inputs.MoveInput;
+        IsAttacking = Inputs.AttackInput;
+        IsSprinting = Inputs.SprintInput && Stats.HasStamina();
+    }
+
     public void HandleRotation()
     {
         // calculate player rotation based on camera rotation
-        Vector3 targetDirection = (PlayerCam.transform.forward * Inputs.MoveInput.z) 
-                                  + (PlayerCam.transform.right * Inputs.MoveInput.x);
+        Vector3 targetDirection = (PlayerCam.transform.forward * Movement.z) 
+                                  + (PlayerCam.transform.right * Movement.x);
         targetDirection.Normalize();
         // set rotation to face forward if player is idle
         if (targetDirection == Vector3.zero) targetDirection = transform.forward;
@@ -100,17 +115,16 @@ public class PlayerManager : MonoBehaviour
     public void HandleMovement()
     {
         // calculate horizontal movement based on camera direction
-        Vector3 targetDirection = (PlayerCam.transform.forward * Inputs.MoveInput.z) 
-                                  + (PlayerCam.transform.right * Inputs.MoveInput.x);
+        Vector3 targetDirection = (PlayerCam.transform.forward * Movement.z) + (PlayerCam.transform.right * Movement.x);
         targetDirection.Normalize();
         // calculate force based on sprint vs walk
-        moveSpeed = Inputs.SprintInput ? sprintSpeed : walkSpeed;
+        moveSpeed = IsSprinting ? sprintSpeed : walkSpeed;
         Vector3 velocity = targetDirection * moveSpeed;
         // move the rigidbody via setting the velocity (results in instant change)
         RigidBody.velocity = velocity;
         // snap animation motion speeds for better animation
-        var horizontal = Inputs.SprintInput ? Inputs.MoveInput.x : Inputs.MoveInput.x / 2; 
-        var vertical = Inputs.SprintInput ? Inputs.MoveInput.z : Inputs.MoveInput.z / 2;
+        var horizontal = IsSprinting ? Movement.x : Movement.x / 2; 
+        var vertical = IsSprinting ? Movement.z : Movement.z / 2;
         horizontal = horizontal switch
         {
             > 0 and < 0.55f => 0.5f,
@@ -135,14 +149,14 @@ public class PlayerManager : MonoBehaviour
     public void GroundedCheck()
     {
         // grounded check via ray casting
-        isGrounded = Physics.Raycast(
+        IsGrounded = Physics.Raycast(
             new Vector3(transform.position.x, transform.position.y - groundedOffset, transform.position.z),
             -Vector3.up,
             out var hit,
             1f,
             _groundLayers);
         // if the player is grounded
-        if (isGrounded) {
+        if (IsGrounded) {
             // snap the y-position of the player to hit-point's y-position
             transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
             // reset the in-air timer
@@ -182,4 +196,5 @@ public class PlayerManager : MonoBehaviour
     {
         Weapon.DisableDamage();
     }
+
 }

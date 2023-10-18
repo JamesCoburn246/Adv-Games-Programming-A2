@@ -7,6 +7,7 @@ TagManager:
   - CameraManager
   - PlayerHitbox
   - EnemyHitbox
+  - FollowTarget
   layers:
   - Default
   - TransparentFX
