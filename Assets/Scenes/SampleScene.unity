@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -324,10 +324,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6801f9498b3e5454881ec5173ff39d41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maximumMana: 100
-  maximumStamina: 100
-  manaBar: {fileID: 64191772}
-  staminaBar: {fileID: 416816396}
 --- !u!114 &159034062
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -340,10 +336,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4259fbe50d9a1846b0c618e8dae494e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maximumHealth: 100
-  maximumArmour: 100
-  healthBar: {fileID: 2092420519}
-  armourBar: {fileID: 1063315466}
 --- !u!1 &160388680
 GameObject:
   m_ObjectHideFlags: 0
@@ -445,8 +437,8 @@ RectTransform:
   m_GameObject: {fileID: 192567947}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.66, y: 0.66, z: 0.66}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1821481543}
   - {fileID: 432370821}
@@ -455,7 +447,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 381, y: 20.25}
+  m_AnchoredPosition: {x: 25, y: 25}
   m_SizeDelta: {x: 381, y: 324}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &192567949
@@ -1434,8 +1426,8 @@ RectTransform:
   m_GameObject: {fileID: 704494346}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.66, y: 0.66, z: 0.66}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1787475930}
   - {fileID: 2121531052}
@@ -1444,7 +1436,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -381, y: 20.25}
+  m_AnchoredPosition: {x: -25, y: 25}
   m_SizeDelta: {x: 381, y: 324}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &704494348
@@ -4114,6 +4106,55 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2037951702
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2037951704}
+  - component: {fileID: 2037951703}
+  m_Layer: 3
+  m_Name: Global Post-Processing
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2037951703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2037951702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sharedProfile: {fileID: 11400000, guid: 7faefdf50821caf4583eed6769002bd8, type: 2}
+  isGlobal: 1
+  blendDistance: 0
+  weight: 1
+  priority: 0
+--- !u!4 &2037951704
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2037951702}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1191.432, y: 529.26544, z: 3236.0818}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -32035,6 +32076,7 @@ SceneRoots:
   - {fileID: 636786132}
   - {fileID: 237733651}
   - {fileID: 2059922646}
+  - {fileID: 2037951704}
   - {fileID: 705507995}
   - {fileID: 1846028301597460103}
   - {fileID: 1978052866}
