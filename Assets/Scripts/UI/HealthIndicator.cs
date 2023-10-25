@@ -2,13 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.UI;
 
 public class HealthIndicator : MonoBehaviour
 {
     public static HealthIndicator Instance { get; private set; }
     private Slider _healthSlider;
+    private PostProcessingManager postProcessingManager;
     private float _targetValue;
+
+    private float currentMaxHealth = 100;
 
     private void Awake()
     {
@@ -23,10 +27,15 @@ public class HealthIndicator : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
+    
     private void OnEnable()
     {
         _healthSlider = GetComponentInChildren<Slider>();
+        postProcessingManager = FindObjectOfType<PostProcessingManager>();
+        if (postProcessingManager == null)
+        {
+            Debug.Log("Post processing manager was not found.");
+        }
     }
 
     // Update is called once per frame
@@ -37,6 +46,7 @@ public class HealthIndicator : MonoBehaviour
     
     public void SetMaxHealth(float maxHealth)
     {
+        currentMaxHealth = maxHealth;
         _healthSlider.maxValue = maxHealth;
         _healthSlider.value = maxHealth;
         _targetValue = maxHealth;
@@ -47,6 +57,7 @@ public class HealthIndicator : MonoBehaviour
     public void SetCurrentHealth(float currentHealth)
     {
         _targetValue = currentHealth;
+        postProcessingManager.setVignetteIntensity(currentHealth / currentMaxHealth);
     }
     
     
