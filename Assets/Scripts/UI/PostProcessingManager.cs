@@ -22,8 +22,6 @@ public class PostProcessingManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-
-            // DontDestroyOnLoad(gameObject);
         }
         else
         {
