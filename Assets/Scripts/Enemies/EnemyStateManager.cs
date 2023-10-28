@@ -171,7 +171,10 @@ public class EnemyStateManager
 
         public override void Enter()
         {
-            timePassed = enemy.attackCooldownTime;
+            // when first entering the chase state,
+            // the enemy should be attacking straight away
+            // after moving into attack range, so time passed is 0 here
+            timePassed = 0;
         }
 
         public override void Update()
@@ -195,45 +198,4 @@ public class EnemyStateManager
             }
         }
     }
-
-    // public class AttackState : State
-    // {
-    //     public AttackState(EnemyStateManager stateManager, EnemyManager enemy) : base(stateManager, enemy)
-    //     {
-    //     }
-    //
-    //
-    //     public override void Enter()
-    //     {
-    //         enemy.Animator.SetTrigger("Attack");
-    //     }
-    //
-    //     public override void FixedUpdate()
-    //     {
-    //         enemy.HandleRotation(false);
-    //         enemy.HandleMovement();
-    //         enemy.SetDestinationToPlayer();
-    //
-    //         timePassed -= Time.deltaTime;
-    //         // if the player is within attack range 
-    //         if (enemy.Agent.remainingDistance < enemy.Agent.stoppingDistance)
-    //         {
-    //             if (timePassed <= 0)
-    //             {
-    //                 timePassed = enemy.attackCooldownTime;
-    //                 stateManager.SwitchState(stateManager.attackState);
-    //             }
-    //         }
-    //         else
-    //         {
-    //             stateManager.SwitchState(stateManager.chaseState);
-    //         }
-    //     }
-    //
-    //
-    //     public override void Exit()
-    //     {
-    //         enemy.Animator.ResetTrigger("Attack");
-    //     }
-    // }
 }
