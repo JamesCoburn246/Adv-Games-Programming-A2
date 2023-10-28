@@ -10,7 +10,7 @@ public class EnemyManager : MonoBehaviour
     private WeaponManager Weapon { get; set; }
     public NavMeshAgent Agent { get; private set; }
     public Animator Animator { get; private set; }
-    private EnemyStateManager StateManager { get; set; }
+    public EnemyStateManager StateManager { get; set; }
 
     private static PlayerManager Player { get; set; }
 
@@ -36,6 +36,7 @@ public class EnemyManager : MonoBehaviour
     public float idleCooldownTime = 5f;
     public float destCooldownTime = 0.1f;
     public float attackCooldownTime = 3f;
+    public bool isDead;
 
     // Start is called before the first frame update
     void Start()
@@ -134,6 +135,13 @@ public class EnemyManager : MonoBehaviour
         if (!(_timePassed <= 0)) return;
         Agent.SetDestination(Player.transform.position);
         _timePassed = destCooldownTime;
+        
+    }
+
+    public void Die()
+    {
+        KillsIndicator.Instance.IncrementCount();
+        Destroy(gameObject);
     }
     
     

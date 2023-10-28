@@ -49,10 +49,35 @@ public class WeaponManager : MonoBehaviour
             if (other.CompareTag("EnemyHitbox"))
             {
                 Debug.Log("Hit Enemy!");
+                EnemyManager enemy = other.GetComponentInParent<EnemyManager>();
                 EnemyStats enemyStats = other.GetComponentInParent<EnemyStats>();
-                if (enemyStats != null)
+                if (enemy != null && enemyStats != null)
                 {
-                    enemyStats.DepleteHealth(weaponDamage);
+                    if (!enemy.isDead)
+                    {
+                        enemyStats.DepleteHealth(weaponDamage);
+                        if (enemy.isDead)
+                        {
+                            if (!enemy.StateManager.CheckState(enemy.StateManager.deathState))
+                            {
+                                enemy.StateManager.SwitchState(enemy.StateManager.deathState);
+                            }
+                        }
+                        else
+                        {
+                            if (!enemy.StateManager.CheckState(enemy.StateManager.damageState))
+                            {
+                                enemy.StateManager.SwitchState(enemy.StateManager.damageState);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!enemy.StateManager.CheckState(enemy.StateManager.deathState))
+                        {
+                            enemy.StateManager.SwitchState(enemy.StateManager.deathState);
+                        }
+                    }
                 }
             } 
         }

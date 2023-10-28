@@ -7,8 +7,9 @@ public class EnemyStateManager
     // public AttackState attackState;
     public ChaseState chaseState;
     public IdleState idleState;
-
     public PatrolState patrolState;
+    public DamageState damageState;
+    public DeathState deathState;
 
     public EnemyStateManager(EnemyManager enemy)
     {
@@ -16,7 +17,8 @@ public class EnemyStateManager
         patrolState = new PatrolState(this, enemy);
         idleState = new IdleState(this, enemy);
         chaseState = new ChaseState(this, enemy);
-        // attackState = new AttackState(this, enemy);
+        damageState = new DamageState(this, enemy);
+        deathState = new DeathState(this, enemy);
         CurrentState = patrolState;
         CurrentState?.Enter();
     }
@@ -171,14 +173,12 @@ public class EnemyStateManager
 
         public override void Enter()
         {
-            // when first entering the chase state,
-            // the enemy should be attacking straight away
-            // after moving into attack range, so time passed is 0 here
-            timePassed = 0;
+            timePassed = enemy.attackCooldownTime;
         }
 
         public override void Update()
         {
+            if (player.IsAnimatorTransitioning) return;
             timePassed -= Time.deltaTime;
             enemy.HandleRotation(true);
             enemy.HandleMovement();
@@ -195,7 +195,66 @@ public class EnemyStateManager
             {
                 enemy.Animator.SetTrigger("Attack");
                 timePassed = enemy.attackCooldownTime;
+                enemy.Agent.isStopped = true;
             }
+            else
+            {
+                enemy.Agent.isStopped = false;
+            }
+        }
+    }
+    
+    public class DamageState : State
+    {
+        public DamageState(EnemyStateManager stateManager, EnemyManager enemy) : base(stateManager, enemy)
+        {
+        }
+
+
+        public override void Enter()
+        {
+            enemy.Animator.SetTrigger("Damage");
+        }
+
+        public override void Update()
+        {
+            if (player.IsAnimatorTransitioning) return;
+
+            if (player.AnimatorStateTime >= 1f)
+            {
+                stateManager.SwitchState(stateManager.chaseState);
+            }
+        }
+
+        public override void Exit()
+        {
+            enemy.Animator.ResetTrigger("Damage");
+        }
+    }
+    
+    public class DeathState : State
+    {
+        public DeathState(EnemyStateManager stateManager, EnemyManager enemy) : base(stateManager, enemy)
+        {
+        }
+
+
+        public override void Enter()
+        {
+            enemy.Animator.SetTrigger("Death");
+        }
+
+        public override void Update()
+        {
+            if (player.IsAnimatorTransitioning) return;
+            if (player.AnimatorStateTime >= 1f)
+            {
+                enemy.Die();
+            }
+        }
+
+        public override void Exit()
+        {
         }
     }
 }
