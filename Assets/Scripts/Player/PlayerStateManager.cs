@@ -264,10 +264,19 @@ public class PlayerStateManager
 
         public override void Enter()
         {
+            player.ResetMovement();
             player.Animator.SetTrigger("Death");
         }
 
-        public override void Update() {}
+        public override void Update()
+        {
+            if (player.IsAnimatorTransitioning) return;
+            if (player.AnimatorStateTime >= 1f)
+            {
+                InputManager.Instance.MenuToggler.ToggleObject.SetActive(true);
+                Cursor.visible = true;
+            }
+        }
 
         public override void Exit()
         {

@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 public class InputManager : MonoBehaviour
 {
@@ -14,6 +15,10 @@ public class InputManager : MonoBehaviour
     public bool AttackInput { get; private set; }
 
     public bool TurnCamInput { get; set; }
+    
+    public bool PauseInput { get; set; }
+
+    public VisibilityToggler MenuToggler { get; set; }
 
     private void Awake()
     {
@@ -28,34 +33,49 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        MenuToggler = GetComponent<VisibilityToggler>();
+        if (MenuToggler.ToggleObject == null)
+        {
+            GameObject mainMenu = GameObject.FindWithTag("InGameMenu");
+            if (mainMenu != null) MenuToggler.ToggleObject = mainMenu;
+            else Debug.Log("Error: Menu toggle is not set!");
+        }
+    }
+
     private void Update()
     {
-        // get move input
-        MoveInput = new Vector3(Input.GetAxisRaw("Horizontal"), 0,Input.GetAxisRaw("Vertical")).normalized;
-        // get sprint input
-        SprintInput = Input.GetKey(KeyCode.Space);
-        // get attack input
-        AttackInput = Input.GetMouseButton(0);
-        // get look input
-        LookInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
-        // get turn cam input
-        TurnCamInput = Input.GetKeyDown(KeyCode.Tab);
-    }
-
-    public void OnMove(InputValue value)
-    {
-        
-    }
-    
-    public void OnLook(InputValue value)
-    {
-        // LookInput = value.Get<Vector2>();
-    }
-
-    public void OnTurnCam(InputValue value)
-    {
-        // TurnCamInput = value.isPressed;
-        // Debug.Log(value.Get());
-        // Debug.Log(value.isPressed);
+        // get pause input
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            PauseInput = !PauseInput;
+            MenuToggler.ToggleVisibility();
+        }
+        // if not paused
+        if (!PauseInput)
+        {
+            // unpause
+            Time.timeScale = 1;
+            Cursor.visible = false;
+            // poll all inputs
+            MoveInput = new Vector3(Input.GetAxisRaw("Horizontal"), 0,Input.GetAxisRaw("Vertical")).normalized;
+            SprintInput = Input.GetKey(KeyCode.Space);
+            AttackInput = Input.GetMouseButton(0) || Input.GetKey(KeyCode.F);
+            LookInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+            TurnCamInput = Input.GetKeyDown(KeyCode.Tab);            
+        }
+        else
+        {
+            // pause
+            Time.timeScale = 0;
+            Cursor.visible = true;
+            // disable all inputs
+            MoveInput = Vector3.zero;
+            SprintInput = false;
+            AttackInput = false;
+            LookInput = Vector2.zero;
+            TurnCamInput = false;            
+        }
     }
 }

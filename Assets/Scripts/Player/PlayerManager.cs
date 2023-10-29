@@ -148,6 +148,11 @@ public class PlayerManager : MonoBehaviour
         Animator.SetFloat("Vertical", vertical, 0.1f, Time.deltaTime);
     }
 
+    public void ResetMovement()
+    {
+        Movement = Vector3.zero;
+    }
+
     public void GroundedCheck()
     {
         // grounded check via ray casting
