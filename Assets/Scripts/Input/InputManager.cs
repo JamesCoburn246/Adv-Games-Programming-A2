@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -13,6 +15,10 @@ public class InputManager : MonoBehaviour
     public bool SprintInput { get; private set; }
 
     public bool AttackInput { get; private set; }
+    
+    WaitForSeconds _attackCooldown;
+    Coroutine _attackWaitCoroutine;
+    const float AttackInputDuration = 0.03f;
 
     public bool TurnCamInput { get; set; }
     
@@ -22,6 +28,7 @@ public class InputManager : MonoBehaviour
 
     private void Awake()
     {
+        _attackCooldown = new WaitForSeconds(AttackInputDuration);
         if (Instance == null)
         {
             Instance = this;
@@ -35,6 +42,7 @@ public class InputManager : MonoBehaviour
 
     private void Start()
     {
+        Cursor.visible = false;
         MenuToggler = GetComponent<VisibilityToggler>();
         if (MenuToggler.ToggleObject == null)
         {
@@ -51,25 +59,36 @@ public class InputManager : MonoBehaviour
         {
             PauseInput = !PauseInput;
             MenuToggler.ToggleVisibility();
+            if (!PauseInput)
+            {
+                // unpause
+                Time.timeScale = 1;
+                Cursor.visible = false;
+            }
+            else
+            {
+                // pause
+                Time.timeScale = 0;
+                Cursor.visible = true;
+            }
         }
         // if not paused
         if (!PauseInput)
         {
-            // unpause
-            Time.timeScale = 1;
-            Cursor.visible = false;
             // poll all inputs
             MoveInput = new Vector3(Input.GetAxisRaw("Horizontal"), 0,Input.GetAxisRaw("Vertical")).normalized;
             SprintInput = Input.GetKey(KeyCode.Space);
-            AttackInput = Input.GetMouseButton(0) || Input.GetKey(KeyCode.F);
+            if (Input.GetKeyDown(KeyCode.F) || Input.GetMouseButtonDown(0))
+            {
+                if (_attackWaitCoroutine != null) StopCoroutine(_attackWaitCoroutine);
+                _attackWaitCoroutine = StartCoroutine(AttackWait());
+            }
+            // AttackInput = Input.GetMouseButton(0) || Input.GetKey(KeyCode.F);
             LookInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
             TurnCamInput = Input.GetKeyDown(KeyCode.Tab);            
         }
         else
         {
-            // pause
-            Time.timeScale = 0;
-            Cursor.visible = true;
             // disable all inputs
             MoveInput = Vector3.zero;
             SprintInput = false;
@@ -77,5 +96,12 @@ public class InputManager : MonoBehaviour
             LookInput = Vector2.zero;
             TurnCamInput = false;            
         }
+    }
+    
+    IEnumerator AttackWait()
+    {
+        AttackInput = true;
+        yield return _attackCooldown;
+        AttackInput = false;
     }
 }

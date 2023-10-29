@@ -271,9 +271,11 @@ public class PlayerStateManager
         public override void Update()
         {
             if (player.IsAnimatorTransitioning) return;
+            Debug.Log(player.Movement);
             if (player.AnimatorStateTime >= 1f)
             {
                 InputManager.Instance.MenuToggler.ToggleObject.SetActive(true);
+                TextIndicator.Instance.SetGameOverVisibility(true);
                 Cursor.visible = true;
             }
         }

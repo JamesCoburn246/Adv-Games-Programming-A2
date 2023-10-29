@@ -25,8 +25,9 @@ public class SceneController : MonoBehaviour
 
     public void LoadGame()
     {
-        SceneManager.LoadScene(1);
         Cursor.visible = false;
+        Time.timeScale = 1;
+        SceneManager.LoadScene(1);
     }
 
     public void LoadMenu()

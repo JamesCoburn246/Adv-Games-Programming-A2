@@ -94,8 +94,8 @@ public class PlayerManager : MonoBehaviour
 
     private void HandleAllInputs()
     {
-        Movement = Inputs.MoveInput;
-        IsAttacking = Inputs.AttackInput;
+        Movement = IsDead ? Vector3.zero : Inputs.MoveInput;
+        IsAttacking =  Inputs.AttackInput && !IsDead;
         IsSprinting = Inputs.SprintInput && Stats.HasStamina();
     }
 
@@ -151,6 +151,7 @@ public class PlayerManager : MonoBehaviour
     public void ResetMovement()
     {
         Movement = Vector3.zero;
+        RigidBody.velocity = Vector3.zero;
     }
 
     public void GroundedCheck()
