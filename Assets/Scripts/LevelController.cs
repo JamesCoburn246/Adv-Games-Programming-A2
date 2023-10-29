@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(AudioSource))]
-public class GameController : MonoBehaviour
+public class LevelController : MonoBehaviour
 {
     [Header("Game Objects")]
+    [SerializeField] private string _entryScene;
     [SerializeField] private GameObject[] spawners;
     [SerializeField] private AudioClip gameWonSound;
     [SerializeField] private AudioClip gameLossSound;
@@ -34,7 +36,7 @@ public class GameController : MonoBehaviour
     private void Awake()
     {
         // Enforce singleton pattern.
-        GameController[] objs = FindObjectsOfType<GameController>();
+        LevelController[] objs = FindObjectsOfType<LevelController>();
         if (objs.Length > 1)
         {
             Destroy(this.gameObject);
@@ -50,6 +52,7 @@ public class GameController : MonoBehaviour
         gameActive = true;
 
         // TODO Initialize game.
+        SceneManager.LoadScene(_entryScene);
 
     }
 
