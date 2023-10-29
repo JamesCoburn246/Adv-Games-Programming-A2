@@ -83,7 +83,6 @@ public class InputManager : MonoBehaviour
                 if (_attackWaitCoroutine != null) StopCoroutine(_attackWaitCoroutine);
                 _attackWaitCoroutine = StartCoroutine(AttackWait());
             }
-            // AttackInput = Input.GetMouseButton(0) || Input.GetKey(KeyCode.F);
             LookInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
             TurnCamInput = Input.GetKeyDown(KeyCode.Tab);            
         }
@@ -97,8 +96,8 @@ public class InputManager : MonoBehaviour
             TurnCamInput = false;            
         }
     }
-    
-    IEnumerator AttackWait()
+
+    private IEnumerator<WaitForSeconds> AttackWait()
     {
         AttackInput = true;
         yield return _attackCooldown;

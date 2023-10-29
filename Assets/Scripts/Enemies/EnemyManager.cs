@@ -143,6 +143,11 @@ public class EnemyManager : MonoBehaviour
     public void Die()
     {
         KillsIndicator.Instance.IncrementCount();
+        if (KillsIndicator.Instance.killsCount == 3)
+        {
+            Player.IsVictorious = true;
+            Player.StateManager.SwitchState(Player.StateManager.victoryState);
+        }
         Destroy(gameObject);
     }
     

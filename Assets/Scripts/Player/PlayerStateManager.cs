@@ -10,6 +10,7 @@ public class PlayerStateManager
     protected static InputManager inputs;
 
     public readonly DeathState deathState;
+    public readonly VictoryState victoryState;
 
     public readonly MoveState moveState;
     public readonly FallState fallState;
@@ -28,6 +29,7 @@ public class PlayerStateManager
         landState = new LandState(this);
         attackState = new AttackState(this);
         deathState = new DeathState(this);
+        victoryState = new VictoryState(this);
         CurrentState = moveState;
         CurrentState?.Enter();
     }
@@ -276,6 +278,36 @@ public class PlayerStateManager
             {
                 InputManager.Instance.MenuToggler.ToggleObject.SetActive(true);
                 TextIndicator.Instance.SetGameOverVisibility(true);
+                Cursor.visible = true;
+            }
+        }
+
+        public override void Exit()
+        {
+        }
+    }
+    
+    public class VictoryState : State
+    {
+        public VictoryState(PlayerStateManager stateManager) : base(stateManager)
+        {
+        }
+
+
+        public override void Enter()
+        {
+            player.ResetMovement();
+            player.Animator.SetTrigger("Victory");
+        }
+
+        public override void Update()
+        {
+            if (player.IsAnimatorTransitioning) return;
+            Debug.Log(player.Movement);
+            if (player.AnimatorStateTime >= 1f)
+            {
+                InputManager.Instance.MenuToggler.ToggleObject.SetActive(true);
+                TextIndicator.Instance.SetGameWonVisibility(true);
                 Cursor.visible = true;
             }
         }

@@ -27,6 +27,7 @@ public class PlayerManager : MonoBehaviour
     public bool IsSprinting { get; private set; }
 
     public bool IsDead { get; set; }
+    public bool IsVictorious { get; set; }
 
     // Controls
     [Header("Movement")]
@@ -94,8 +95,8 @@ public class PlayerManager : MonoBehaviour
 
     private void HandleAllInputs()
     {
-        Movement = IsDead ? Vector3.zero : Inputs.MoveInput;
-        IsAttacking =  Inputs.AttackInput && !IsDead;
+        Movement = IsDead || IsVictorious ? Vector3.zero : Inputs.MoveInput;
+        IsAttacking =  Inputs.AttackInput && !IsDead && !IsVictorious;
         IsSprinting = Inputs.SprintInput && Stats.HasStamina();
     }
 

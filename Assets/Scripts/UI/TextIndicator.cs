@@ -35,5 +35,10 @@ public class TextIndicator : MonoBehaviour
     {
         gameOverText.SetActive(visibility);
     }
+    
+    public void SetGameWonVisibility(bool visibility)
+    {
+        gameWonText.SetActive(visibility);
+    }
 
 }
