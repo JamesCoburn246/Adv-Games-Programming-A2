@@ -31,9 +31,16 @@ public class GameController : MonoBehaviour
     // TODO Game won state
     // TODO Game loss state
 
-    private void Start()
+    private void Awake()
     {
-        
+        // Enforce singleton pattern.
+        GameController[] objs = FindObjectsOfType<GameController>();
+        if (objs.Length > 1)
+        {
+            Destroy(this.gameObject);
+        }
+        // Ensure that this class is persistent between scenes.
+        DontDestroyOnLoad(this.gameObject);
     }
 
     public void StartGame()
@@ -62,7 +69,7 @@ public class GameController : MonoBehaviour
     }
 
     public void TriggerGameEnd(bool win)
-    { 
+    {
         // State lock.
         if (!gameActive) { return; }
         gameActive = false;
@@ -77,7 +84,8 @@ public class GameController : MonoBehaviour
             // Play game won sound.
             source.clip = gameWonSound;
             source.Play();
-        } else
+        }
+        else
         {
             // TODO Show game loss screen.
 
