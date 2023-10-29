@@ -10,6 +10,7 @@ public class EnemyStateManager
     public PatrolState patrolState;
     public DamageState damageState;
     public DeathState deathState;
+    public State CurrentState { get; private set; }
 
     public EnemyStateManager(EnemyManager enemy)
     {
@@ -29,7 +30,6 @@ public class EnemyStateManager
         CurrentState?.Enter();
     }
 
-    public State CurrentState { get; private set; }
 
     public void LogicUpdate()
     {
@@ -184,11 +184,15 @@ public class EnemyStateManager
             enemy.HandleMovement();
             // set destination to player
             enemy.SetDestinationToPlayer();
+            // if the player is within detection range but is hidden by an object or is dead, switch to the idle state
+            if (player.IsDead) stateManager.SwitchState(stateManager.idleState);
             // perform a raycast towards the player 
             if (enemy.RayCastToPlayer(enemy.detectionDistance))
-                // if the player is not within detection range, switch to the idle state
+            {
+                // if the player is within detection range but is hidden by an object or is dead, switch to the idle state
                 if (enemy.rayHit.collider.gameObject.layer != LayerMask.NameToLayer("Player"))
                     stateManager.SwitchState(stateManager.idleState);
+            }
             // if the player is within attacking range
             if (Vector3.Distance(player.transform.position, enemy.transform.position) <= enemy.attackDistance &&
                 timePassed <= 0)

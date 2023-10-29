@@ -9,16 +9,16 @@ public class PlayerStateManager
 
     protected static InputManager inputs;
 
-    public MoveState moveState { get; private set; }
-    public FallState fallState { get; private set; }
+    public readonly DeathState deathState;
 
-    public LandState landState { get; private set; }
-    
-    public AttackState attackState { get; private set; }
+    public readonly MoveState moveState;
+    public readonly FallState fallState;
 
+    public readonly LandState landState;
 
-    protected State CurrentState;
-    
+    public readonly AttackState attackState;
+    private State CurrentState { get; set; }
+
     public PlayerStateManager()
     {
         inputs = InputManager.Instance;
@@ -27,6 +27,7 @@ public class PlayerStateManager
         fallState = new FallState(this);
         landState = new LandState(this);
         attackState = new AttackState(this);
+        deathState = new DeathState(this);
         CurrentState = moveState;
         CurrentState?.Enter();
     }
@@ -54,6 +55,11 @@ public class PlayerStateManager
         CurrentState?.Exit();
         CurrentState = newState;
         CurrentState?.Enter();
+    }
+    
+    public bool CheckState(State stateToCheck)
+    {
+        return CurrentState == stateToCheck;
     }
     
     // Base State
@@ -249,7 +255,24 @@ public class PlayerStateManager
     }
 
 
+    public class DeathState : State
+    {
+        public DeathState(PlayerStateManager stateManager) : base(stateManager)
+        {
+        }
 
+
+        public override void Enter()
+        {
+            player.Animator.SetTrigger("Death");
+        }
+
+        public override void Update() {}
+
+        public override void Exit()
+        {
+        }
+    }
 
 
 

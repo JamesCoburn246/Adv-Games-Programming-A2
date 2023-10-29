@@ -35,13 +35,13 @@ public class EnemyStats : MonoBehaviour
 
     public void DepleteHealth(float value)
     {
-        if (enemy.isDead) return;
+        if (enemy.IsDead) return;
         _currentHealth -= value;
         _currentHealth = Mathf.Clamp(_currentHealth, 0, maxHealth);
         healthIndicator.SetCurrentHealth(_currentHealth);
         if (_currentHealth <= 0)
         {
-            enemy.isDead = true;
+            enemy.IsDead = true;
         }
     }
 }

@@ -26,6 +26,8 @@ public class PlayerManager : MonoBehaviour
     public bool IsAttacking { get; private set; }
     public bool IsSprinting { get; private set; }
 
+    public bool IsDead { get; set; }
+
     // Controls
     [Header("Movement")]
     public float moveSpeed;
