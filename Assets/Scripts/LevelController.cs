@@ -47,17 +47,19 @@ public class LevelController : MonoBehaviour
         Cursor.visible = true;
     }
 
-    public void StartGame()
+    private void Update()
     {
-        // State lock.
-        if (gameActive) { return; }
-        gameActive = true;
-
-        SceneManager.LoadScene(1);
-        Time.timeScale = 1;
-
-        // Hide the cursor.
-        Cursor.visible = false;
+        if (LivingSpawners > 0)
+        {
+            // TODO Handle spawning enemies. Waves. Et cetera.
+        }
+        else
+        {
+            if (LivingEnemes <= 0)
+            {
+                TriggerGameEnd(true);
+            }
+        }
     }
 
     public void ReturnToMainMenu()
@@ -73,19 +75,17 @@ public class LevelController : MonoBehaviour
         Cursor.visible = true;
     }
 
-    private void Update()
+    public void StartGame()
     {
-        if (LivingSpawners > 0)
-        {
-            // TODO Handle spawning enemies. Waves. Et cetera.
-        }
-        else
-        {
-            if (LivingEnemes <= 0)
-            {
-                TriggerGameEnd(true);
-            }
-        }
+        // State lock.
+        if (gameActive) { return; }
+        gameActive = true;
+
+        SceneManager.LoadScene(1);
+        Time.timeScale = 1;
+
+        // Hide the cursor.
+        Cursor.visible = false;
     }
 
     public void TriggerGameEnd(bool win)
