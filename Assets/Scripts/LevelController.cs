@@ -86,6 +86,9 @@ public class LevelController : MonoBehaviour
 
         // Hide the cursor.
         Cursor.visible = false;
+
+        // Fetch spawners (portals).
+        //spawners = GameObject.FindObjectOfType<>();
     }
 
     public void TriggerGameEnd(bool win)
