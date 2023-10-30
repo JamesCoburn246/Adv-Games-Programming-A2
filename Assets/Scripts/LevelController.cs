@@ -9,7 +9,6 @@ using UnityEngine.SceneManagement;
 public class LevelController : MonoBehaviour
 {
     [Header("Game Objects")]
-    [SerializeField] private string _entryScene;
     [SerializeField] private GameObject[] spawners;
     [SerializeField] private AudioClip gameWonSound;
     [SerializeField] private AudioClip gameLossSound;
@@ -43,6 +42,9 @@ public class LevelController : MonoBehaviour
         }
         // Ensure that this class is persistent between scenes.
         DontDestroyOnLoad(this.gameObject);
+
+        // Ensure that the cursor is visible initially
+        Cursor.visible = true;
     }
 
     public void StartGame()
@@ -51,9 +53,24 @@ public class LevelController : MonoBehaviour
         if (gameActive) { return; }
         gameActive = true;
 
-        // TODO Initialize game.
-        SceneManager.LoadScene(_entryScene);
+        SceneManager.LoadScene(1);
+        Time.timeScale = 1;
 
+        // Hide the cursor.
+        Cursor.visible = false;
+    }
+
+    public void ReturnToMainMenu()
+    {
+        // State lock.
+        if (!gameActive) { return; }
+        gameActive = false;
+
+        SceneManager.LoadScene(0);
+        Time.timeScale = 0;
+
+        // Show the cursor again.
+        Cursor.visible = true;
     }
 
     private void Update()
