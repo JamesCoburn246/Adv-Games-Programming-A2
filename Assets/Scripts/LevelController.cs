@@ -84,17 +84,16 @@ public class LevelController : MonoBehaviour
         {
             // TODO Show game won screen.
 
-            // Play game won sound.
+            // Select game won sound to be played.
             source.clip = gameWonSound;
-            source.Play();
         }
         else
         {
             // TODO Show game loss screen.
 
-            // Play game loss sound.
+            // Select game loss sound to be played.
             source.clip = gameLossSound;
-            source.Play();
         }
+        source.Play();
     }
 }
