@@ -18,8 +18,8 @@ public class CameraController : MonoBehaviour
     public float camMoveSpeed = 0.3f;
     [Range(0.01f, 2f)]
     public float camTurnSpeed = 1.5f;
-    [Range(-10f, 0f)]
-    public float camDistance = -7.5f;
+    [Range(-15f, 0f)]
+    public float camDistance = -15f;
 
     public Transform followTarget;
 
@@ -37,8 +37,8 @@ public class CameraController : MonoBehaviour
     
     private int _currCamIndex;
 
-    [Range(0f, 10f)]
-    public float camIsoDistance = 7f;
+    [Range(-100f, -10f)]
+    public float camIsoDistance = -100f;
 
     public float camIsoSmoothTime = 0.3f;
 
@@ -69,10 +69,11 @@ public class CameraController : MonoBehaviour
     {
         if (!isoView)
         {
-            if (_mainCam.orthographic)
+            if (_mainCam.fieldOfView <= 20.0f)
             {
                 // set orthographic to false
-                _mainCam.orthographic = false;
+                // _mainCam.orthographic = false;
+                _mainCam.fieldOfView = 60;
                 // adjust the near and far clip planes
                 _mainCam.nearClipPlane = 0.01f;
                 _mainCam.farClipPlane = 1000f;
@@ -88,13 +89,18 @@ public class CameraController : MonoBehaviour
         }
         else
         {
-            if (!_mainCam.orthographic)
+            if (_mainCam.fieldOfView > 20.0f)
             {
                 // set orthographic to true
-                _mainCam.orthographic = true;
+                // _mainCam.orthographic = true;
+                _mainCam.fieldOfView = 20;
+                _mainCam.transform.localPosition =  new Vector3(0, 0, camIsoDistance);
                 // adjust the near and far clip planes
-                _mainCam.nearClipPlane = -100f;
-                _mainCam.farClipPlane = 100f;
+                _mainCam.nearClipPlane = 0.01f;
+                _mainCam.farClipPlane = 1000f;
+                // // adjust the near and far clip planes
+                // _mainCam.nearClipPlane = -500f;
+                // _mainCam.farClipPlane = 500f;
                 // set the right z-distance
                 _mainCam.orthographicSize = camIsoDistance;
             }
