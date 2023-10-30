@@ -393,7 +393,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 2
   m_Constraints: 112
   m_CollisionDetection: 1
 --- !u!136 &-9185480153770857326
@@ -418,7 +418,7 @@ CapsuleCollider:
   m_Radius: 0.25
   m_Height: 1.65
   m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: 0, y: 1.05, z: 0}
 --- !u!114 &4166757640795800848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -437,7 +437,7 @@ MonoBehaviour:
   sprintSpeed: 6.5
   fallingSpeed: 30
   inAirTime: 0
-  groundedOffset: -0.425
+  groundedOffset: -0.45
 --- !u!114 &517852181284785439
 MonoBehaviour:
   m_ObjectHideFlags: 0

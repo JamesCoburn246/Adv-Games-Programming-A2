@@ -26,6 +26,9 @@ public class PlayerManager : MonoBehaviour
     public bool IsAttacking { get; private set; }
     public bool IsSprinting { get; private set; }
 
+    public bool IsDead { get; set; }
+    public bool IsVictorious { get; set; }
+
     // Controls
     [Header("Movement")]
     public float moveSpeed;
@@ -92,8 +95,8 @@ public class PlayerManager : MonoBehaviour
 
     private void HandleAllInputs()
     {
-        Movement = Inputs.MoveInput;
-        IsAttacking = Inputs.AttackInput;
+        Movement = IsDead || IsVictorious ? Vector3.zero : Inputs.MoveInput;
+        IsAttacking =  Inputs.AttackInput && !IsDead && !IsVictorious;
         IsSprinting = Inputs.SprintInput && Stats.HasStamina();
     }
 
@@ -146,6 +149,12 @@ public class PlayerManager : MonoBehaviour
         Animator.SetFloat("Vertical", vertical, 0.1f, Time.deltaTime);
     }
 
+    public void ResetMovement()
+    {
+        Movement = Vector3.zero;
+        RigidBody.velocity = Vector3.zero;
+    }
+
     public void GroundedCheck()
     {
         // grounded check via ray casting
@@ -158,7 +167,7 @@ public class PlayerManager : MonoBehaviour
         // if the player is grounded
         if (IsGrounded) {
             // snap the y-position of the player to hit-point's y-position
-            transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+            transform.position = new Vector3(transform.position.x, hit.point.y + 0.035f, transform.position.z);
             // reset the in-air timer
             inAirTime = 0;
         }        

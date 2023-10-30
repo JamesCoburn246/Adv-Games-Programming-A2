@@ -47,9 +47,14 @@ public class PlayerStats : MonoBehaviour
 
     public void DepleteHealth(float value)
     {
+        if (PlayerManager.Instance.IsDead) return;
         _currentHealth -= value;
         _currentHealth = Mathf.Clamp(_currentHealth, 0, maxHealth);
         healthIndicator.SetCurrentHealth(_currentHealth);
+        if (_currentHealth <= 0)
+        {
+            PlayerManager.Instance.IsDead = true;
+        }
     }
     
     // --------------- Stamina Stuff ------------------- //
