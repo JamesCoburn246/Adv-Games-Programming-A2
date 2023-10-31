@@ -56,7 +56,6 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
     private void Start()
     {
         stats = GetComponent<EnemyStats>();
@@ -74,7 +73,6 @@ public class EnemyManager : MonoBehaviour
         _timePassed = destCooldownTime;
     }
 
-    // Update is called once per frame
     private void Update()
     {
         _timePassed -= Time.deltaTime;
