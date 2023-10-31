@@ -5,12 +5,14 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Serialization;
 
+[RequireComponent(typeof(EnemyStats))]
 public class EnemyManager : MonoBehaviour
 {
     private WeaponManager Weapon { get; set; }
     public NavMeshAgent Agent { get; private set; }
     public Animator Animator { get; private set; }
     public EnemyStateManager StateManager { get; set; }
+    private EnemyStats stats;
 
     private static PlayerManager Player { get; set; }
 
@@ -36,11 +38,31 @@ public class EnemyManager : MonoBehaviour
     public float idleCooldownTime = 5f;
     public float destCooldownTime = 0.1f;
     public float attackCooldownTime = 3f;
-    public bool IsDead { get; set; }
+
+    // This state is now handled by the EnemyStats class.
+    public bool IsDead
+    {
+        get
+        {
+            return !stats.IsAlive();
+        }
+        set
+        {
+            if (value)
+            {
+                stats.Die();
+            }
+            else
+            {
+                stats.Revive();
+            }
+        }
+    }
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
+        stats = GetComponent<EnemyStats>();
         Weapon = GetComponentInChildren<WeaponManager>();
         Weapon.SetDamage(25);
         Agent = GetComponent<NavMeshAgent>();
@@ -56,7 +78,7 @@ public class EnemyManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         _timePassed -= Time.deltaTime;
         StateManager.LogicUpdate();
