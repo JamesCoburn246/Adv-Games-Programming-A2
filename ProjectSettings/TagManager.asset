@@ -9,6 +9,7 @@ TagManager:
   - EnemyHitbox
   - FollowTarget
   - InGameMenu
+  - SpawnerHitbox
   layers:
   - Default
   - TransparentFX

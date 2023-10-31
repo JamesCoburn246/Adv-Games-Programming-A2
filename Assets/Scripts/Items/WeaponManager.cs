@@ -53,7 +53,7 @@ public class WeaponManager : MonoBehaviour
                     }
                 }
             } 
-            if (other.CompareTag("EnemyHitbox"))
+            else if (other.CompareTag("EnemyHitbox"))
             {
                 Debug.Log("Hit Enemy!");
                 EnemyManager enemy = other.GetComponentInParent<EnemyManager>();
@@ -76,7 +76,12 @@ public class WeaponManager : MonoBehaviour
                         }
                     }
                 }
-            } 
+            }
+            else if (other.CompareTag("SpawnerHitbow"))
+            {
+                Debug.Log("Hit Spawner!");
+                SpawnerManager spawnerManager = other.GetComponentInParent<SpawnerManager>();
+            }
         }
     }
 }
