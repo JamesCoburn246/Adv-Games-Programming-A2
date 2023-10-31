@@ -167,7 +167,7 @@ public class PlayerManager : MonoBehaviour
         // if the player is grounded
         if (IsGrounded) {
             // snap the y-position of the player to hit-point's y-position
-            transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+            transform.position = new Vector3(transform.position.x, hit.point.y + 0.035f, transform.position.z);
             // reset the in-air timer
             inAirTime = 0;
         }        
