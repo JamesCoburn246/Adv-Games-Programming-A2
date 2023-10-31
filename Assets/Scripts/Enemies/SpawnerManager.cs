@@ -3,6 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(EnemyStats))]
 public class SpawnerManager : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject objectToSpawn;
+    [SerializeField]
+    private Vector3 offset;
+
     private EnemyStats stats;
 
     // This state is now handled by the EnemyStats class.
@@ -33,9 +38,9 @@ public class SpawnerManager : MonoBehaviour
 
     public void SpawnEnemy()
     {
-
+        Vector3 pos = this.transform.position + offset;
+        Instantiate(objectToSpawn, pos, this.transform.rotation);
     }
-
 
     public void Die()
     {
