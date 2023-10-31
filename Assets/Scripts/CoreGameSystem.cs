@@ -17,6 +17,8 @@ public class CoreGameSystem : MonoBehaviour
     private List<SpawnerManager> spawnerManagers;
     private List<EnemyManager> livingEnemies;
     private AudioSource source;
+
+    // Internal state.
     private bool gameActive = false;
 
     private int LivingSpawnerCount
