@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,13 +18,22 @@ public class CoreGameSystem : MonoBehaviour
     private List<EnemyManager> livingEnemies;
     private AudioSource source;
     private bool gameActive = false;
-    private int LivingSpawners
+
+    private int LivingSpawnerCount
     {
-        get { return spawners.Length; }
+        get
+        {
+            spawnerManagers.RemoveAll(i => i == null);
+            return spawnerManagers.Count;
+        }
     }
-    private int LivingEnemes
+    private int LivingEnemyCount
     {
-        get { return livingEnemies.Length; }
+        get
+        {
+            livingEnemies.RemoveAll(i => i == null);
+            return livingEnemies.Count;
+        }
     }
 
     // TODO Manager Waves
@@ -46,14 +57,14 @@ public class CoreGameSystem : MonoBehaviour
 
     private void Update()
     {
-        if (LivingSpawners > 0)
+        if (LivingSpawnerCount > 0)
         {
             // TODO Handle spawning enemies. Waves. Et cetera.
         }
         else
         {
-            if (LivingEnemes <= 0)
-            {
+            if (LivingEnemyCount <= 0)
+            {                                                         
                 TriggerGameEnd(true);
             }
         }
@@ -84,8 +95,10 @@ public class CoreGameSystem : MonoBehaviour
         // Hide the cursor.
         Cursor.visible = false;
 
-        // Fetch spawners (portals).
-        //spawners = GameObject.FindObjectOfType<>();
+        // Fetch all enemies and spawners (portals) that started on the level.
+        livingEnemies = FindObjectsOfType<EnemyManager>().ToList();
+        spawnerManagers = FindObjectsOfType<SpawnerManager>().ToList();
+        // Fetch audio source reference.
         source = GetComponent<AudioSource>();
     }
 
@@ -96,6 +109,9 @@ public class CoreGameSystem : MonoBehaviour
         gameActive = false;
 
         // Handle generic end-game effects.
+        livingEnemies = null;
+        spawnerManagers = null;
+
         // Handle win/loss specific end-game effects.
         if (win)
         {
