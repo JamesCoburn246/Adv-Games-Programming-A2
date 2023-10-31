@@ -29,10 +29,9 @@ public class SpawnerManager : MonoBehaviour
     private void Start()
     {
         stats = GetComponent<EnemyStats>();
-
     }
 
-    private void Update()
+    public void SpawnEnemy()
     {
 
     }

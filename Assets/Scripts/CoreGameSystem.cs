@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ExceptionServices;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,8 +12,37 @@ public class CoreGameSystem : MonoBehaviour
     [SerializeField] private AudioClip gameWonSound;
     [SerializeField] private AudioClip gameLossSound;
 
-    [Header("Settings")]
-    [SerializeField] private int enemiesPerWave;
+    [Header("Wave Settings")]
+    [SerializeField]
+    private int initialWaveSize = 8;
+    [SerializeField]
+    private int waveGrowthPerWave = 2;
+    [SerializeField]
+    private int spawnProgressGrowth = 15;
+    [SerializeField]
+    private int waveCooldown = 8;
+
+    // Game constants.
+    private const int maxSpawnProgress = 100;
+    private const int minSpawnProgress = 0;
+
+    // Chance to spawn an enemy each second.
+    private int spawnProgress;
+    // How many enemies are left until the wave ends.
+    private int waveSize;
+    private int MaxWaveSize
+    {
+        get
+        {
+            return initialWaveSize + (waveGrowthPerWave * wavesCompleted);
+        }
+        set { }
+    }
+
+    private bool waveActive;
+    private int wavesCompleted;
+    private float timeSinceLastWaveTick;
+    private int remainingCooldown;
 
     // Lists of objects.
     private List<SpawnerManager> spawnerManagers;
@@ -57,21 +88,6 @@ public class CoreGameSystem : MonoBehaviour
         Cursor.visible = true;
     }
 
-    private void Update()
-    {
-        if (LivingSpawnerCount > 0)
-        {
-            // TODO Handle spawning enemies. Waves. Et cetera.
-        }
-        else
-        {
-            if (LivingEnemyCount <= 0)
-            {                                                         
-                TriggerGameEnd(true);
-            }
-        }
-    }
-
     public void ReturnToMainMenu()
     {
         // State lock.
@@ -102,6 +118,9 @@ public class CoreGameSystem : MonoBehaviour
         spawnerManagers = FindObjectsOfType<SpawnerManager>().ToList();
         // Fetch audio source reference.
         source = GetComponent<AudioSource>();
+
+        spawnProgress = maxSpawnProgress;
+        waveActive = true;
     }
 
     public void TriggerGameEnd(bool win)
@@ -130,5 +149,67 @@ public class CoreGameSystem : MonoBehaviour
             source.clip = gameLossSound;
         }
         source.Play();
+    }
+
+    private void Update()
+    {
+        if (LivingSpawnerCount > 0)
+        {
+            // Perform wave checks once per second.
+            timeSinceLastWaveTick += Time.deltaTime;
+            if (timeSinceLastWaveTick >= 1.0f)
+            {
+                timeSinceLastWaveTick -= 1.0f;
+                DoWaveChecks();
+            }
+        }
+        else
+        {
+            // If there are no more spawner and no more enemies, the player wins.
+            if (LivingEnemyCount <= 0)
+            {
+                TriggerGameEnd(true);
+            }
+        }
+    }
+
+    // This will only be called once per second.
+    private void DoWaveChecks()
+    {
+        if (waveActive)
+        {
+            // If we're in a wave, increase SpawnProgress.
+            spawnProgress += spawnProgressGrowth;
+            // Each second, attempt to spawn an enemy based on SpawnProgress.
+            int roll = Random.Range(minSpawnProgress, maxSpawnProgress - 1);
+            if (roll >= spawnProgress)
+            {
+                // Spawn an enemy at a random portal.
+                int rand = Random.Range(0, LivingSpawnerCount - 1);
+                spawnerManagers[rand].SpawnEnemy();
+                // When a spawn occurs, reduce SpawnProgress by 100; reduce WaveSize by 1.
+                spawnProgress -= 100;
+                waveSize -= 1;
+                // Re-acquire references to all living enemies. This also purges dead enemies which are now null-references.
+                livingEnemies = FindObjectsOfType<EnemyManager>().ToList();
+            }
+
+            // If WaveSize hits 0, end the wave.
+            if (waveSize <= 0)
+            {
+                remainingCooldown = waveCooldown;
+                waveActive = false;
+            }
+        }
+        else
+        {
+            // If we aren't in a wave, reduce WaveCooldown until it hits 0. If it does, start a wave.
+            remainingCooldown -= 1;
+            if (remainingCooldown <= 0)
+            {
+                waveSize = MaxWaveSize;
+                waveActive = true;
+            }
+        }
     }
 }
