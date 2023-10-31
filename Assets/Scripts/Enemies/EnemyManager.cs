@@ -46,6 +46,7 @@ public class EnemyManager : MonoBehaviour
         {
             if (value)
             {
+                this.Die();
                 stats.Die();
             }
             else
