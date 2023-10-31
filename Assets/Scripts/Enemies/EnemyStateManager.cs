@@ -7,10 +7,8 @@ public class EnemyStateManager
     // public AttackState attackState;
     public ChaseState chaseState;
     public IdleState idleState;
+
     public PatrolState patrolState;
-    public DamageState damageState;
-    public DeathState deathState;
-    public State CurrentState { get; private set; }
 
     public EnemyStateManager(EnemyManager enemy)
     {
@@ -18,8 +16,7 @@ public class EnemyStateManager
         patrolState = new PatrolState(this, enemy);
         idleState = new IdleState(this, enemy);
         chaseState = new ChaseState(this, enemy);
-        damageState = new DamageState(this, enemy);
-        deathState = new DeathState(this, enemy);
+        // attackState = new AttackState(this, enemy);
         CurrentState = patrolState;
         CurrentState?.Enter();
     }
@@ -30,6 +27,7 @@ public class EnemyStateManager
         CurrentState?.Enter();
     }
 
+    public State CurrentState { get; private set; }
 
     public void LogicUpdate()
     {
@@ -178,87 +176,64 @@ public class EnemyStateManager
 
         public override void Update()
         {
-            if (player.IsAnimatorTransitioning) return;
             timePassed -= Time.deltaTime;
             enemy.HandleRotation(true);
             enemy.HandleMovement();
             // set destination to player
             enemy.SetDestinationToPlayer();
-            // if the player is within detection range but is hidden by an object or is dead, switch to the idle state
-            if (player.IsDead) stateManager.SwitchState(stateManager.idleState);
             // perform a raycast towards the player 
             if (enemy.RayCastToPlayer(enemy.detectionDistance))
-            {
-                // if the player is within detection range but is hidden by an object or is dead, switch to the idle state
+                // if the player is not within detection range, switch to the idle state
                 if (enemy.rayHit.collider.gameObject.layer != LayerMask.NameToLayer("Player"))
                     stateManager.SwitchState(stateManager.idleState);
-            }
             // if the player is within attacking range
             if (Vector3.Distance(player.transform.position, enemy.transform.position) <= enemy.attackDistance &&
                 timePassed <= 0)
             {
                 enemy.Animator.SetTrigger("Attack");
                 timePassed = enemy.attackCooldownTime;
-                enemy.Agent.isStopped = true;
-            }
-            else
-            {
-                enemy.Agent.isStopped = false;
             }
         }
     }
-    
-    public class DamageState : State
-    {
-        public DamageState(EnemyStateManager stateManager, EnemyManager enemy) : base(stateManager, enemy)
-        {
-        }
 
-
-        public override void Enter()
-        {
-            enemy.Animator.SetTrigger("Damage");
-        }
-
-        public override void Update()
-        {
-            if (player.IsAnimatorTransitioning) return;
-
-            if (player.AnimatorStateTime >= 1f)
-            {
-                stateManager.SwitchState(stateManager.chaseState);
-            }
-        }
-
-        public override void Exit()
-        {
-            enemy.Animator.ResetTrigger("Damage");
-        }
-    }
-    
-    public class DeathState : State
-    {
-        public DeathState(EnemyStateManager stateManager, EnemyManager enemy) : base(stateManager, enemy)
-        {
-        }
-
-
-        public override void Enter()
-        {
-            enemy.Animator.SetTrigger("Death");
-        }
-
-        public override void Update()
-        {
-            if (player.IsAnimatorTransitioning) return;
-            if (player.AnimatorStateTime >= 1f)
-            {
-                enemy.Die();
-            }
-        }
-
-        public override void Exit()
-        {
-        }
-    }
+    // public class AttackState : State
+    // {
+    //     public AttackState(EnemyStateManager stateManager, EnemyManager enemy) : base(stateManager, enemy)
+    //     {
+    //     }
+    //
+    //
+    //     public override void Enter()
+    //     {
+    //         enemy.Animator.SetTrigger("Attack");
+    //     }
+    //
+    //     public override void FixedUpdate()
+    //     {
+    //         enemy.HandleRotation(false);
+    //         enemy.HandleMovement();
+    //         enemy.SetDestinationToPlayer();
+    //
+    //         timePassed -= Time.deltaTime;
+    //         // if the player is within attack range 
+    //         if (enemy.Agent.remainingDistance < enemy.Agent.stoppingDistance)
+    //         {
+    //             if (timePassed <= 0)
+    //             {
+    //                 timePassed = enemy.attackCooldownTime;
+    //                 stateManager.SwitchState(stateManager.attackState);
+    //             }
+    //         }
+    //         else
+    //         {
+    //             stateManager.SwitchState(stateManager.chaseState);
+    //         }
+    //     }
+    //
+    //
+    //     public override void Exit()
+    //     {
+    //         enemy.Animator.ResetTrigger("Attack");
+    //     }
+    // }
 }

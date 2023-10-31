@@ -47,7 +47,7 @@ public class CameraController : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            // DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -61,7 +61,8 @@ public class CameraController : MonoBehaviour
         followTarget = GameObject.FindWithTag("FollowTarget").transform;
         _cameraPivot = transform.GetChild(0);
         _mainCam = Camera.main;
-        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     // Update is called once per frame

@@ -2,42 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 public class SceneController : MonoBehaviour
 {
-    public SceneController Instance { get; private set; }
-    [SerializeField] private string entryScene;
-    
+    [SerializeField] private string _entryScene;
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        DontDestroyOnLoad(this.gameObject);
     }
 
-    public void LoadGame()
+    public void StartGame()
     {
-        Cursor.visible = false;
-        Time.timeScale = 1;
-        SceneManager.LoadScene(1);
-    }
-
-    public void LoadMenu()
-    {
-        SceneManager.LoadScene(0);
-        Cursor.visible = true;
-    }
-
-    public void LoadScene(string sceneName)
-    {
-        SceneManager.LoadScene(sceneName);
+        SceneManager.LoadScene(_entryScene);
     }
 }

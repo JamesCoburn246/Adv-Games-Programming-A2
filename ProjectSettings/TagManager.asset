@@ -8,7 +8,6 @@ TagManager:
   - PlayerHitbox
   - EnemyHitbox
   - FollowTarget
-  - InGameMenu
   layers:
   - Default
   - TransparentFX
