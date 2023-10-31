@@ -7,6 +7,8 @@ public class EnemyStats : MonoBehaviour
     [SerializeField] 
     private float maxHealth;
 
+    private EnemyManager enemy;
+
     // public float maxDamage;
     
     // ------ current stats ---------- //
@@ -19,6 +21,7 @@ public class EnemyStats : MonoBehaviour
     {
         _currentHealth = maxHealth;
         healthIndicator = GetComponentInChildren<EnemyHealthIndicator>();
+        enemy = GetComponent<EnemyManager>();
         healthIndicator.SetMaxHealth(_currentHealth);
     }
 
@@ -32,8 +35,13 @@ public class EnemyStats : MonoBehaviour
 
     public void DepleteHealth(float value)
     {
+        if (enemy.IsDead) return;
         _currentHealth -= value;
         _currentHealth = Mathf.Clamp(_currentHealth, 0, maxHealth);
         healthIndicator.SetCurrentHealth(_currentHealth);
+        if (_currentHealth <= 0)
+        {
+            enemy.IsDead = true;
+        }
     }
 }

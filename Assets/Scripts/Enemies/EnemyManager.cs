@@ -10,7 +10,7 @@ public class EnemyManager : MonoBehaviour
     private WeaponManager Weapon { get; set; }
     public NavMeshAgent Agent { get; private set; }
     public Animator Animator { get; private set; }
-    private EnemyStateManager StateManager { get; set; }
+    public EnemyStateManager StateManager { get; set; }
 
     private static PlayerManager Player { get; set; }
 
@@ -36,12 +36,13 @@ public class EnemyManager : MonoBehaviour
     public float idleCooldownTime = 5f;
     public float destCooldownTime = 0.1f;
     public float attackCooldownTime = 3f;
+    public bool IsDead { get; set; }
 
     // Start is called before the first frame update
     void Start()
     {
         Weapon = GetComponentInChildren<WeaponManager>();
-        Weapon.SetDamage(5);
+        Weapon.SetDamage(25);
         Agent = GetComponent<NavMeshAgent>();
         Animator = GetComponent<Animator>();
         StateManager = new EnemyStateManager(this);
@@ -69,7 +70,7 @@ public class EnemyManager : MonoBehaviour
     public void HandleRotation(bool isLockedOn)
     {
         Vector3 targetDirection;
-        if (!isLockedOn)
+        if (!isLockedOn || Player.IsDead)
         {
             // calculate agent direction based on velocity
             targetDirection = Agent.velocity.normalized;
@@ -119,12 +120,14 @@ public class EnemyManager : MonoBehaviour
 
     public bool IsPlayerInView()
     {
+        if (Player.IsDead) return false;
         _rayToPlayer = new Ray(lookTransform.position,Player.lookTransform.position - lookTransform.position);
         return Mathf.Abs(Vector3.Angle(lookTransform.forward, _rayToPlayer.direction)) <= fieldOfView;
     }
 
     public bool RayCastToPlayer(float maxDistance)
     {
+        if (Player.IsDead) return false;
         _rayToPlayer = new Ray(lookTransform.position,Player.lookTransform.position - lookTransform.position);
         return Physics.Raycast(_rayToPlayer, out rayHit, maxDistance, enemyExcludeMask);
     }
@@ -134,6 +137,18 @@ public class EnemyManager : MonoBehaviour
         if (!(_timePassed <= 0)) return;
         Agent.SetDestination(Player.transform.position);
         _timePassed = destCooldownTime;
+        
+    }
+
+    public void Die()
+    {
+        KillsIndicator.Instance.IncrementCount();
+        if (KillsIndicator.Instance.killsCount == 3)
+        {
+            Player.IsVictorious = true;
+            Player.StateManager.SwitchState(Player.StateManager.victoryState);
+        }
+        Destroy(gameObject);
     }
     
     

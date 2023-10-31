@@ -26,6 +26,9 @@ public class PlayerManager : MonoBehaviour
     public bool IsAttacking { get; private set; }
     public bool IsSprinting { get; private set; }
 
+    public bool IsDead { get; set; }
+    public bool IsVictorious { get; set; }
+
     // Controls
     [Header("Movement")]
     public float moveSpeed;
@@ -92,8 +95,8 @@ public class PlayerManager : MonoBehaviour
 
     private void HandleAllInputs()
     {
-        Movement = Inputs.MoveInput;
-        IsAttacking = Inputs.AttackInput;
+        Movement = IsDead || IsVictorious ? Vector3.zero : Inputs.MoveInput;
+        IsAttacking =  Inputs.AttackInput && !IsDead && !IsVictorious;
         IsSprinting = Inputs.SprintInput && Stats.HasStamina();
     }
 
@@ -144,6 +147,12 @@ public class PlayerManager : MonoBehaviour
         // animate motion
         Animator.SetFloat("Horizontal", horizontal, 0.1f, Time.deltaTime);
         Animator.SetFloat("Vertical", vertical, 0.1f, Time.deltaTime);
+    }
+
+    public void ResetMovement()
+    {
+        Movement = Vector3.zero;
+        RigidBody.velocity = Vector3.zero;
     }
 
     public void GroundedCheck()
