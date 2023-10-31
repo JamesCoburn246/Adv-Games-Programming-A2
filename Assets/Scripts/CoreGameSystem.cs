@@ -5,20 +5,21 @@ using UnityEngine.SceneManagement;
 public class CoreGameSystem : MonoBehaviour
 {
     [Header("Game Objects")]
-    [SerializeField] private GameObject[] spawners;
     [SerializeField] private AudioClip gameWonSound;
     [SerializeField] private AudioClip gameLossSound;
 
     [Header("Settings")]
     [SerializeField] private int enemiesPerWave;
 
-    // Internal objects.
+    // Lists of objects.
+    private List<SpawnerManager> spawnerManagers;
+    private List<EnemyManager> livingEnemies;
+    private AudioSource source;
     private bool gameActive = false;
     private int LivingSpawners
     {
         get { return spawners.Length; }
     }
-    private GameObject[] livingEnemies;
     private int LivingEnemes
     {
         get { return livingEnemies.Length; }
@@ -85,6 +86,7 @@ public class CoreGameSystem : MonoBehaviour
 
         // Fetch spawners (portals).
         //spawners = GameObject.FindObjectOfType<>();
+        source = GetComponent<AudioSource>();
     }
 
     public void TriggerGameEnd(bool win)
@@ -94,7 +96,6 @@ public class CoreGameSystem : MonoBehaviour
         gameActive = false;
 
         // Handle generic end-game effects.
-        AudioSource source = GetComponent<AudioSource>();
         // Handle win/loss specific end-game effects.
         if (win)
         {
