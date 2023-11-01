@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(AudioSource))]
-public class LevelController : MonoBehaviour
+public class CoreGameSystem : MonoBehaviour
 {
     [Header("Game Objects")]
     [SerializeField] private GameObject[] spawners;
@@ -35,7 +35,7 @@ public class LevelController : MonoBehaviour
     private void Awake()
     {
         // Enforce singleton pattern.
-        LevelController[] objs = FindObjectsOfType<LevelController>();
+        CoreGameSystem[] objs = FindObjectsOfType<CoreGameSystem>();
         if (objs.Length > 1)
         {
             Destroy(this.gameObject);
