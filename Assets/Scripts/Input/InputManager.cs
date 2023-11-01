@@ -57,19 +57,13 @@ public class InputManager : MonoBehaviour
         // get pause input
         if (Input.GetKeyDown(KeyCode.P))
         {
-            PauseInput = !PauseInput;
-            MenuToggler.ToggleVisibility();
-            if (!PauseInput)
+            if (PauseInput)
             {
-                // unpause
-                Time.timeScale = 1;
-                Cursor.visible = false;
+                DeActivatePauseMenu();
             }
             else
             {
-                // pause
-                Time.timeScale = 0;
-                Cursor.visible = true;
+                ActivatePauseMenu();
             }
         }
         // if not paused
@@ -95,6 +89,22 @@ public class InputManager : MonoBehaviour
             LookInput = Vector2.zero;
             TurnCamInput = false;            
         }
+    }
+
+    public void ActivatePauseMenu()
+    {
+        PauseInput = true;
+        MenuToggler.ToggleObject.SetActive(true);
+        Time.timeScale = 0;
+        Cursor.visible = true;
+    }
+    
+    public void DeActivatePauseMenu()
+    {
+        PauseInput = false;
+        MenuToggler.ToggleObject.SetActive(false);
+        Time.timeScale = 1;
+        Cursor.visible = false;
     }
 
     private IEnumerator<WaitForSeconds> AttackWait()

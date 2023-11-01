@@ -436,6 +436,7 @@ MonoBehaviour:
   walkSpeed: 2.5
   sprintSpeed: 6.5
   fallingSpeed: 30
+  weaponDamage: 10
   inAirTime: 0
   groundedOffset: -0.45
 --- !u!114 &517852181284785439

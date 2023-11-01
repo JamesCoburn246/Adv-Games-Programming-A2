@@ -21,14 +21,14 @@ public class EnemyManager : MonoBehaviour
     
     [Header("Movement")]
     public float moveSpeed;
-    public float walkSpeed = 2.5f;
-    public float sprintSpeed = 6.5f;
+    public float walkSpeed = 3.5f;
+    public float sprintSpeed = 8.5f;
 
     [Header("AI Settings")] 
     public Transform[] patrolPoints;
-
-    public float attackDistance = 1.5f;
-    public float detectionDistance = 7.5f;
+    public float attackDistance = 1.75f;
+    public float detectionDistance = 12.5f;
+    public float weaponDamage = 5;
 
     private float _timePassed;
     public float idleCooldownTime = 5f;
@@ -57,7 +57,7 @@ public class EnemyManager : MonoBehaviour
     {
         stats = GetComponent<EnemyStats>();
         Weapon = GetComponentInChildren<WeaponManager>();
-        Weapon.SetDamage(25);
+        Weapon.SetDamage(weaponDamage);
         Agent = GetComponent<NavMeshAgent>();
         Animator = GetComponent<Animator>();
         StateManager = new EnemyStateManager(this);

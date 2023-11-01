@@ -185,9 +185,7 @@ public class CoreGameSystem : MonoBehaviour
         }
         _source.Play();
         // activate the in-game menu
-        InputManager.Instance.MenuToggler.ToggleObject.SetActive(true);
-        // make cursor visible
-        Cursor.visible = true;
+        InputManager.Instance.ActivatePauseMenu();
     }
 
     private void Update()

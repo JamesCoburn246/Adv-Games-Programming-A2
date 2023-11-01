@@ -35,6 +35,7 @@ public class PlayerManager : MonoBehaviour
     public float walkSpeed = 2.5f;
     public float sprintSpeed = 6.5f;
     public float fallingSpeed = 30f;
+    public float weaponDamage = 10;
     public float inAirTime;
     
     // Grounded Checks
@@ -74,7 +75,7 @@ public class PlayerManager : MonoBehaviour
         StateManager = new PlayerStateManager();
         Stats = GetComponent<PlayerStats>();
         Weapon = GetComponentInChildren<WeaponManager>();
-        Weapon.SetDamage(10);
+        Weapon.SetDamage(weaponDamage);
         lookTransform = transform.GetChild(0);
         _groundLayers = LayerMask.GetMask("Environment");
 
