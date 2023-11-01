@@ -5,6 +5,8 @@ public class SpawnerManager : MonoBehaviour
 {
     [SerializeField]
     private GameObject objectToSpawn;
+    [SerializeField] 
+    private Transform spawnPoint;
     [SerializeField]
     private Vector3 offset;
 
@@ -36,9 +38,9 @@ public class SpawnerManager : MonoBehaviour
     public void SpawnEnemy(Transform[] patrolPoints)
     {
         // Debug.Log("Spawned enemy!");
-        EnemyManager enemy = Instantiate(objectToSpawn).GetComponent<EnemyManager>();
+        EnemyManager enemy = Instantiate(objectToSpawn, spawnPoint).GetComponent<EnemyManager>();
         enemy.patrolPoints = patrolPoints;
-        enemy.transform.position = transform.position + offset;
+        enemy.transform.position = spawnPoint.position + offset;
         // Instantiate(objectToSpawn, pos, transform.rotation);
     }
 

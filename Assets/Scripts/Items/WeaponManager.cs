@@ -60,6 +60,7 @@ public class WeaponManager : MonoBehaviour
                 EnemyStats enemyStats = other.GetComponentInParent<EnemyStats>();
                 if (enemy != null && enemyStats != null)
                 {
+                    if (enemy.IsDead) return;
                     enemyStats.DepleteHealth(weaponDamage);
                     if (enemy.IsDead)
                     {

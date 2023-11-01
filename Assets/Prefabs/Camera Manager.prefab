@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bc9566f4ed190d45adc4bfa215cebe0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isoView: 0
+  isoView: 1
   camMoveSpeed: 0.3
   camTurnSpeed: 1.5
   camDistance: -15
