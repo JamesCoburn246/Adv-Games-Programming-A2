@@ -13,15 +13,12 @@ public class SpawnerManager : MonoBehaviour
     // This state is now handled by the EnemyStats class.
     public bool IsDead
     {
-        get
-        {
-            return !stats.IsAlive();
-        }
+        get => !stats.IsAlive();
         set
         {
             if (value)
             {
-                this.Die();
+                Die();
                 stats.Die();
             }
             else
@@ -36,10 +33,13 @@ public class SpawnerManager : MonoBehaviour
         stats = GetComponent<EnemyStats>();
     }
 
-    public void SpawnEnemy()
+    public void SpawnEnemy(Transform[] patrolPoints)
     {
-        Vector3 pos = this.transform.position + offset;
-        Instantiate(objectToSpawn, pos, this.transform.rotation);
+        // Debug.Log("Spawned enemy!");
+        EnemyManager enemy = Instantiate(objectToSpawn).GetComponent<EnemyManager>();
+        enemy.patrolPoints = patrolPoints;
+        enemy.transform.position = transform.position + offset;
+        // Instantiate(objectToSpawn, pos, transform.rotation);
     }
 
     public void Die()

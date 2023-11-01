@@ -6,8 +6,8 @@ public class KillsIndicator : MonoBehaviour
 {
     public static KillsIndicator Instance { get; private set; }
     public TextMeshProUGUI killsText;
-    public int killsCount;
-    public int enemiesCount;
+    private int _killsCount;
+    private int _enemiesCount;
 
     
     private void Awake()
@@ -24,17 +24,23 @@ public class KillsIndicator : MonoBehaviour
         }
     }
     
-    private void Start()
+    private void OnEnable()
     {
-        killsCount = 0;
-        enemiesCount = 3;
+        _killsCount = 0;
+        _enemiesCount = 0;
         killsText = GetComponentInChildren<TextMeshProUGUI>();
-        killsText.SetText("x " + killsCount + " / " + enemiesCount);
+        killsText.SetText("x " + _killsCount + " / " + _enemiesCount);
     }
 
-    public void IncrementCount()
+    public void UpdateEnemyCount(int enemyCount)
     {
-        killsCount++;
-        killsText.SetText("x " + killsCount + " / " + enemiesCount);
+        _enemiesCount += enemyCount;
+        killsText.SetText("x " + _killsCount + " / " + _enemiesCount);
+    }
+
+    public void UpdateKillsCount()
+    {
+        _killsCount++;
+        killsText.SetText("x " + _killsCount + " / " + _enemiesCount);
     }
 }

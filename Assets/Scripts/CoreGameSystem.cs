@@ -1,18 +1,24 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(AudioSource))]
 public class CoreGameSystem : MonoBehaviour
 {
+    public static CoreGameSystem Instance { get; private set; }
+
     [Header("Game Objects")]
     [SerializeField] private AudioClip gameWonSound;
     [SerializeField] private AudioClip gameLossSound;
 
-    [Header("Wave Settings")]
+    [Header("Wave Settings")] 
+    [SerializeField]
+    private int numberOfWaves = 4;
     [SerializeField]
     private int initialWaveSize = 8;
     [SerializeField]
@@ -23,49 +29,66 @@ public class CoreGameSystem : MonoBehaviour
     private int waveCooldown = 8;
 
     // Game constants.
-    private const int maxSpawnProgress = 100;
-    private const int minSpawnProgress = 0;
+    private const int MaxSpawnProgress = 100;
+    private const int MinSpawnProgress = 0;
 
     // Chance to spawn an enemy each second.
-    private int spawnProgress;
+    private int _spawnProgress;
     // How many enemies are left until the wave ends.
-    private int waveSize;
-    private int MaxWaveSize
-    {
-        get
-        {
-            return initialWaveSize + (waveGrowthPerWave * wavesCompleted);
-        }
-        set { }
-    }
+    private int _waveSize;
+    private int MaxWaveSize => initialWaveSize + (waveGrowthPerWave * _wavesCompleted);
 
-    private bool waveActive;
-    private int wavesCompleted;
-    private float timeSinceLastWaveTick;
-    private int remainingCooldown;
+    private bool _waveActive;
+    private int _wavesCompleted;
+    private float _timeSinceLastWaveTick;
+    private int _remainingCooldown;
 
     // Lists of objects.
-    private List<SpawnerManager> spawnerManagers;
-    private List<EnemyManager> livingEnemies;
-    private AudioSource source;
+    private List<SpawnerManager> _spawnerManagers;
+    private List<EnemyManager> _livingEnemies;
+    private AudioSource _source;
 
     // Internal state.
-    private bool gameActive = false;
+    private bool _gameActive;
+    
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
+    {
+        if (scene.buildIndex == 1)
+        {
+            StartGame();
+        }
+        else
+        {
+            ReturnToMainMenu();
+        }
+    }
 
     private int LivingSpawnerCount
     {
         get
         {
-            spawnerManagers.RemoveAll(i => i == null);
-            return spawnerManagers.Count;
+            if (_spawnerManagers == null) return 0;
+            _spawnerManagers.RemoveAll(i => i == null);
+            return _spawnerManagers.Count;
         }
     }
     private int LivingEnemyCount
     {
         get
         {
-            livingEnemies.RemoveAll(i => i == null);
-            return livingEnemies.Count;
+            if (_livingEnemies == null) return 0;
+            _livingEnemies.RemoveAll(i => i == null);
+            return _livingEnemies.Count;
         }
     }
 
@@ -75,91 +98,113 @@ public class CoreGameSystem : MonoBehaviour
 
     private void Awake()
     {
-        // Enforce singleton pattern.
-        CoreGameSystem[] objs = FindObjectsOfType<CoreGameSystem>();
-        if (objs.Length > 1)
+        if (Instance == null)
         {
-            Destroy(this.gameObject);
+            Instance = this;
         }
-        // Ensure that this class is persistent between scenes.
-        DontDestroyOnLoad(this.gameObject);
-
-        // Ensure that the cursor is visible initially
-        Cursor.visible = true;
+        else
+        {
+            Destroy(gameObject);
+        }
+        // // Enforce singleton pattern.
+        // CoreGameSystem[] objs = FindObjectsOfType<CoreGameSystem>();
+        // if (objs.Length > 1)
+        // {
+        //     Destroy(gameObject);
+        // }
+        // // Ensure that this class is persistent between scenes.
+        // DontDestroyOnLoad(gameObject);
+        //
+        // // Ensure that the cursor is visible initially
+        // Cursor.visible = true;
     }
 
-    public void ReturnToMainMenu()
+    private void ReturnToMainMenu()
     {
         // State lock.
-        if (!gameActive) { return; }
-        gameActive = false;
+        if (!_gameActive) { return; }
+        _gameActive = false;
 
-        SceneManager.LoadScene(0);
         Time.timeScale = 0;
 
         // Show the cursor again.
         Cursor.visible = true;
     }
 
-    public void StartGame()
+    private void StartGame()
     {
         // State lock.
-        if (gameActive) { return; }
-        gameActive = true;
+        if (_gameActive) { return; }
+        _gameActive = true;
 
-        SceneManager.LoadScene(1);
         Time.timeScale = 1;
 
         // Hide the cursor.
         Cursor.visible = false;
 
         // Fetch all enemies and spawners (portals) that started on the level.
-        livingEnemies = FindObjectsOfType<EnemyManager>().ToList();
-        spawnerManagers = FindObjectsOfType<SpawnerManager>().ToList();
+        _livingEnemies = FindObjectsOfType<EnemyManager>().ToList();
+        _spawnerManagers = FindObjectsOfType<SpawnerManager>().ToList();
+        Debug.Log(_spawnerManagers.Count);
+        
         // Fetch audio source reference.
-        source = GetComponent<AudioSource>();
+        _source = GetComponent<AudioSource>();
 
-        spawnProgress = maxSpawnProgress;
-        waveActive = true;
+        _spawnProgress = 0;
+        _waveSize = MaxWaveSize;
+        _wavesCompleted = 0;
+        KillsIndicator.Instance.UpdateEnemyCount(MaxWaveSize);
+        _waveActive = true;
     }
 
     public void TriggerGameEnd(bool win)
     {
         // State lock.
-        if (!gameActive) { return; }
-        gameActive = false;
+        if (!_gameActive) { return; }
+        _gameActive = false;
 
         // Handle generic end-game effects.
-        livingEnemies = null;
-        spawnerManagers = null;
+        _livingEnemies = null;
+        _spawnerManagers = null;
 
         // Handle win/loss specific end-game effects.
         if (win)
         {
             // TODO Show game won screen.
-
+            // show game won text
+            TextIndicator.Instance.SetGameWonVisibility(true);
             // Select game won sound to be played.
-            source.clip = gameWonSound;
+            _source.clip = gameWonSound;
         }
         else
         {
             // TODO Show game loss screen.
-
+            TextIndicator.Instance.SetGameOverVisibility(true);
             // Select game loss sound to be played.
-            source.clip = gameLossSound;
+            _source.clip = gameLossSound;
         }
-        source.Play();
+        _source.Play();
+        // activate the in-game menu
+        InputManager.Instance.MenuToggler.ToggleObject.SetActive(true);
+        // make cursor visible
+        Cursor.visible = true;
     }
 
     private void Update()
     {
+        // check if the player is dead or not
+        if (_gameActive && PlayerManager.Instance.IsDead)
+        {
+            TriggerGameEnd(false);
+        }
+        // if not, then continue with game logic 
         if (LivingSpawnerCount > 0)
         {
             // Perform wave checks once per second.
-            timeSinceLastWaveTick += Time.deltaTime;
-            if (timeSinceLastWaveTick >= 1.0f)
+            _timeSinceLastWaveTick += Time.deltaTime;
+            if (_timeSinceLastWaveTick >= 1.0f)
             {
-                timeSinceLastWaveTick -= 1.0f;
+                _timeSinceLastWaveTick = 0f;
                 DoWaveChecks();
             }
         }
@@ -176,39 +221,49 @@ public class CoreGameSystem : MonoBehaviour
     // This will only be called once per second.
     private void DoWaveChecks()
     {
-        if (waveActive)
+        if (_waveActive)
         {
             // If we're in a wave, increase SpawnProgress.
-            spawnProgress += spawnProgressGrowth;
+            _spawnProgress += spawnProgressGrowth;
             // Each second, attempt to spawn an enemy based on SpawnProgress.
-            int roll = Random.Range(minSpawnProgress, maxSpawnProgress - 1);
-            if (roll >= spawnProgress)
+            int roll = Random.Range(MinSpawnProgress, MaxSpawnProgress);
+            if (roll >= _spawnProgress)
             {
-                // Spawn an enemy at a random portal.
-                int rand = Random.Range(0, LivingSpawnerCount - 1);
-                spawnerManagers[rand].SpawnEnemy();
+                // Spawn an enemy with random patrol points at a random portal.
+                int rand = Random.Range(0, LivingSpawnerCount);
+                int point1 = Random.Range(0, 3);
+                int point2 = Random.Range(4, 7);
+                int point3 = Random.Range(8, 12);
+                Transform[] patrolPoints = {
+                    PatrolManager.Instance.patrolPoints[point1],
+                    PatrolManager.Instance.patrolPoints[point2],
+                    PatrolManager.Instance.patrolPoints[point3],
+                };
+                _spawnerManagers[rand].SpawnEnemy(patrolPoints);
                 // When a spawn occurs, reduce SpawnProgress by 100; reduce WaveSize by 1.
-                spawnProgress -= 100;
-                waveSize -= 1;
+                _spawnProgress -= 100;
+                _waveSize -= 1;
                 // Re-acquire references to all living enemies. This also purges dead enemies which are now null-references.
-                livingEnemies = FindObjectsOfType<EnemyManager>().ToList();
+                _livingEnemies = FindObjectsOfType<EnemyManager>().ToList();
             }
 
             // If WaveSize hits 0, end the wave.
-            if (waveSize <= 0)
+            if (_waveSize <= 0)
             {
-                remainingCooldown = waveCooldown;
-                waveActive = false;
+                _remainingCooldown = waveCooldown;
+                _waveActive = false;
             }
         }
-        else
+        else 
         {
-            // If we aren't in a wave, reduce WaveCooldown until it hits 0. If it does, start a wave.
-            remainingCooldown -= 1;
-            if (remainingCooldown <= 0)
+            // If we aren't in a wave, reduce WaveCooldown until it hits 0. If it does, start the next wave - if there are more.
+            _remainingCooldown -= 1;
+            if (_remainingCooldown <= 0 && _wavesCompleted < numberOfWaves)
             {
-                waveSize = MaxWaveSize;
-                waveActive = true;
+                _wavesCompleted++;
+                _waveSize = MaxWaveSize;
+                KillsIndicator.Instance.UpdateEnemyCount(MaxWaveSize);
+                _waveActive = true;
             }
         }
     }

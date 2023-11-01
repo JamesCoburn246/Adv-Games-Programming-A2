@@ -77,10 +77,19 @@ public class WeaponManager : MonoBehaviour
                     }
                 }
             }
-            else if (other.CompareTag("SpawnerHitbow"))
+            else if (other.CompareTag("SpawnerHitbox"))
             {
                 Debug.Log("Hit Spawner!");
-                SpawnerManager spawnerManager = other.GetComponentInParent<SpawnerManager>();
+                EnemyStats enemyStats = other.GetComponentInParent<EnemyStats>();
+                if (enemyStats != null)
+                {
+                    enemyStats.DepleteHealth(weaponDamage);
+                    if (enemyStats.IsDead())
+                    {
+                        enemyStats.Die();
+                        enemyStats.Destroy();
+                    }
+                }
             }
         }
     }

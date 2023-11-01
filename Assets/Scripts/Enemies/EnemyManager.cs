@@ -38,15 +38,12 @@ public class EnemyManager : MonoBehaviour
     // This state is now handled by the EnemyStats class.
     public bool IsDead
     {
-        get
-        {
-            return !stats.IsAlive();
-        }
+        get => !stats.IsAlive();
         set
         {
             if (value)
             {
-                this.Die();
+                Die();
                 stats.Die();
             }
             else
@@ -56,7 +53,7 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void OnEnable()
     {
         stats = GetComponent<EnemyStats>();
         Weapon = GetComponentInChildren<WeaponManager>();
@@ -159,12 +156,7 @@ public class EnemyManager : MonoBehaviour
 
     public void Die()
     {
-        KillsIndicator.Instance.IncrementCount();
-        if (KillsIndicator.Instance.killsCount == 3)
-        {
-            Player.IsVictorious = true;
-            Player.StateManager.SwitchState(Player.StateManager.victoryState);
-        }
+        KillsIndicator.Instance.UpdateKillsCount();
         Destroy(gameObject);
     }
     

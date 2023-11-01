@@ -12,7 +12,7 @@ public class EnemyStats : MonoBehaviour
     private float _currentHealth;
     private bool _isAlive = true;
 
-    private void Start()
+    private void OnEnable()
     {
         _currentHealth = maxHealth;
         // Fetch indicator if one isn't specified.
@@ -69,5 +69,10 @@ public class EnemyStats : MonoBehaviour
 
         _isAlive = false;
         _currentHealth = 0;
+    }
+
+    public void Destroy()
+    {
+        Destroy(gameObject);
     }
 }
