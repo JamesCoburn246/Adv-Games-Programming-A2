@@ -1,16 +1,14 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Serialization;
 
+[RequireComponent(typeof(EnemyStats))]
 public class EnemyManager : MonoBehaviour
 {
     private WeaponManager Weapon { get; set; }
     public NavMeshAgent Agent { get; private set; }
     public Animator Animator { get; private set; }
-    private EnemyStateManager StateManager { get; set; }
+    public EnemyStateManager StateManager { get; set; }
+    private EnemyStats stats;
 
     private static PlayerManager Player { get; set; }
 
@@ -23,25 +21,43 @@ public class EnemyManager : MonoBehaviour
     
     [Header("Movement")]
     public float moveSpeed;
-    public float walkSpeed = 2.5f;
-    public float sprintSpeed = 6.5f;
+    public float walkSpeed = 3.5f;
+    public float sprintSpeed = 8.5f;
 
     [Header("AI Settings")] 
     public Transform[] patrolPoints;
-
-    public float attackDistance = 1.5f;
-    public float detectionDistance = 7.5f;
+    public float attackDistance = 1.75f;
+    public float detectionDistance = 12.5f;
+    public float weaponDamage = 5;
 
     private float _timePassed;
     public float idleCooldownTime = 5f;
     public float destCooldownTime = 0.1f;
     public float attackCooldownTime = 3f;
 
-    // Start is called before the first frame update
-    void Start()
+    // This state is now handled by the EnemyStats class.
+    public bool IsDead
     {
+        get => !stats.IsAlive();
+        set
+        {
+            if (value)
+            {
+                Die();
+                stats.Die();
+            }
+            else
+            {
+                stats.Revive();
+            }
+        }
+    }
+
+    private void OnEnable()
+    {
+        stats = GetComponent<EnemyStats>();
         Weapon = GetComponentInChildren<WeaponManager>();
-        Weapon.SetDamage(5);
+        Weapon.SetDamage(weaponDamage);
         Agent = GetComponent<NavMeshAgent>();
         Animator = GetComponent<Animator>();
         StateManager = new EnemyStateManager(this);
@@ -54,8 +70,7 @@ public class EnemyManager : MonoBehaviour
         _timePassed = destCooldownTime;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         _timePassed -= Time.deltaTime;
         StateManager.LogicUpdate();
@@ -69,7 +84,7 @@ public class EnemyManager : MonoBehaviour
     public void HandleRotation(bool isLockedOn)
     {
         Vector3 targetDirection;
-        if (!isLockedOn)
+        if (!isLockedOn || Player.IsDead)
         {
             // calculate agent direction based on velocity
             targetDirection = Agent.velocity.normalized;
@@ -119,12 +134,14 @@ public class EnemyManager : MonoBehaviour
 
     public bool IsPlayerInView()
     {
+        if (Player.IsDead) return false;
         _rayToPlayer = new Ray(lookTransform.position,Player.lookTransform.position - lookTransform.position);
         return Mathf.Abs(Vector3.Angle(lookTransform.forward, _rayToPlayer.direction)) <= fieldOfView;
     }
 
     public bool RayCastToPlayer(float maxDistance)
     {
+        if (Player.IsDead) return false;
         _rayToPlayer = new Ray(lookTransform.position,Player.lookTransform.position - lookTransform.position);
         return Physics.Raycast(_rayToPlayer, out rayHit, maxDistance, enemyExcludeMask);
     }
@@ -134,6 +151,13 @@ public class EnemyManager : MonoBehaviour
         if (!(_timePassed <= 0)) return;
         Agent.SetDestination(Player.transform.position);
         _timePassed = destCooldownTime;
+        
+    }
+
+    public void Die()
+    {
+        KillsIndicator.Instance.UpdateKillsCount();
+        Destroy(gameObject);
     }
     
     

@@ -44,17 +44,54 @@ public class WeaponManager : MonoBehaviour
                 if (playerStats != null)
                 {
                     playerStats.DepleteHealth(weaponDamage);
+                    if (PlayerManager.Instance.IsDead)
+                    {
+                        if (!PlayerManager.Instance.StateManager.CheckState(PlayerManager.Instance.StateManager.deathState))
+                        {
+                            PlayerManager.Instance.StateManager.SwitchState(PlayerManager.Instance.StateManager.deathState);
+                        }
+                    }
                 }
             } 
-            if (other.CompareTag("EnemyHitbox"))
+            else if (other.CompareTag("EnemyHitbox"))
             {
                 Debug.Log("Hit Enemy!");
+                EnemyManager enemy = other.GetComponentInParent<EnemyManager>();
+                EnemyStats enemyStats = other.GetComponentInParent<EnemyStats>();
+                if (enemy != null && enemyStats != null)
+                {
+                    if (enemy.IsDead) return;
+                    enemyStats.DepleteHealth(weaponDamage);
+                    if (enemy.IsDead)
+                    {
+                        if (!enemy.StateManager.CheckState(enemy.StateManager.deathState))
+                        {
+                            enemy.StateManager.SwitchState(enemy.StateManager.deathState);
+                        }
+                    }
+                    else
+                    {
+                        if (!enemy.StateManager.CheckState(enemy.StateManager.damageState))
+                        {
+                            enemy.StateManager.SwitchState(enemy.StateManager.damageState);
+                        }
+                    }
+                }
+            }
+            else if (other.CompareTag("SpawnerHitbox"))
+            {
+                Debug.Log("Hit Spawner!");
                 EnemyStats enemyStats = other.GetComponentInParent<EnemyStats>();
                 if (enemyStats != null)
                 {
                     enemyStats.DepleteHealth(weaponDamage);
+                    if (enemyStats.IsDead())
+                    {
+                        enemyStats.Die();
+                        enemyStats.Destroy();
+                    }
                 }
-            } 
+            }
         }
     }
 }
