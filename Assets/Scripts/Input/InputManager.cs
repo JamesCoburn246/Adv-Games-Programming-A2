@@ -71,7 +71,7 @@ public class InputManager : MonoBehaviour
         {
             // poll all inputs
             MoveInput = new Vector3(Input.GetAxisRaw("Horizontal"), 0,Input.GetAxisRaw("Vertical")).normalized;
-            SprintInput = Input.GetKey(KeyCode.Space);
+            SprintInput = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.Space);
             if (Input.GetKeyDown(KeyCode.F) || Input.GetMouseButtonDown(0))
             {
                 if (_attackWaitCoroutine != null) StopCoroutine(_attackWaitCoroutine);

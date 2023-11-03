@@ -24,7 +24,7 @@ public class CoreGameSystem : MonoBehaviour
     [SerializeField]
     private int waveGrowthPerWave = 2;
     [SerializeField]
-    private int spawnProgressGrowth = 15;
+    private int spawnProgressGrowth = 18;
     [SerializeField]
     private int waveCooldown = 8;
 
@@ -33,7 +33,7 @@ public class CoreGameSystem : MonoBehaviour
     private const int MinSpawnProgress = 0;
 
     // Chance to spawn an enemy each second.
-    private int _spawnProgress;
+    private int _spawnProgress = MinSpawnProgress;
     // How many enemies are left until the wave ends.
     private int _waveSize;
     private int MaxWaveSize => initialWaveSize + (waveGrowthPerWave * _wavesCompleted);
@@ -225,7 +225,7 @@ public class CoreGameSystem : MonoBehaviour
             _spawnProgress += spawnProgressGrowth;
             // Each second, attempt to spawn an enemy based on SpawnProgress.
             int roll = Random.Range(MinSpawnProgress, MaxSpawnProgress);
-            if (roll >= _spawnProgress)
+            if (roll < _spawnProgress)
             {
                 // Spawn an enemy with random patrol points at a random portal.
                 int rand = Random.Range(0, LivingSpawnerCount);
@@ -238,8 +238,8 @@ public class CoreGameSystem : MonoBehaviour
                     PatrolManager.Instance.patrolPoints[point3],
                 };
                 _spawnerManagers[rand].SpawnEnemy(patrolPoints);
-                // When a spawn occurs, reduce SpawnProgress by 100; reduce WaveSize by 1.
-                _spawnProgress -= 100;
+                // When a spawn occurs, reset SpawnProgress; reduce WaveSize by 1.
+                _spawnProgress = MinSpawnProgress;
                 _waveSize -= 1;
                 // Re-acquire references to all living enemies. This also purges dead enemies which are now null-references.
                 _livingEnemies = FindObjectsOfType<EnemyManager>().ToList();
