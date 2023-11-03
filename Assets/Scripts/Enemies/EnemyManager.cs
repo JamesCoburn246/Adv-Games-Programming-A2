@@ -1,16 +1,14 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Serialization;
 
+[RequireComponent(typeof(EnemyStats))]
 public class EnemyManager : MonoBehaviour
 {
     private WeaponManager Weapon { get; set; }
     public NavMeshAgent Agent { get; private set; }
     public Animator Animator { get; private set; }
     public EnemyStateManager StateManager { get; set; }
+    private EnemyStats stats;
 
     private static PlayerManager Player { get; set; }
 
@@ -23,26 +21,43 @@ public class EnemyManager : MonoBehaviour
     
     [Header("Movement")]
     public float moveSpeed;
-    public float walkSpeed = 2.5f;
-    public float sprintSpeed = 6.5f;
+    public float walkSpeed = 3.5f;
+    public float sprintSpeed = 8.5f;
 
     [Header("AI Settings")] 
     public Transform[] patrolPoints;
-
-    public float attackDistance = 1.5f;
-    public float detectionDistance = 7.5f;
+    public float attackDistance = 1.75f;
+    public float detectionDistance = 12.5f;
+    public float weaponDamage = 5;
 
     private float _timePassed;
     public float idleCooldownTime = 5f;
     public float destCooldownTime = 0.1f;
     public float attackCooldownTime = 3f;
-    public bool IsDead { get; set; }
 
-    // Start is called before the first frame update
-    void Start()
+    // This state is now handled by the EnemyStats class.
+    public bool IsDead
     {
+        get => !stats.IsAlive();
+        set
+        {
+            if (value)
+            {
+                Die();
+                stats.Die();
+            }
+            else
+            {
+                stats.Revive();
+            }
+        }
+    }
+
+    private void OnEnable()
+    {
+        stats = GetComponent<EnemyStats>();
         Weapon = GetComponentInChildren<WeaponManager>();
-        Weapon.SetDamage(25);
+        Weapon.SetDamage(weaponDamage);
         Agent = GetComponent<NavMeshAgent>();
         Animator = GetComponent<Animator>();
         StateManager = new EnemyStateManager(this);
@@ -55,8 +70,7 @@ public class EnemyManager : MonoBehaviour
         _timePassed = destCooldownTime;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         _timePassed -= Time.deltaTime;
         StateManager.LogicUpdate();
@@ -142,12 +156,7 @@ public class EnemyManager : MonoBehaviour
 
     public void Die()
     {
-        KillsIndicator.Instance.IncrementCount();
-        if (KillsIndicator.Instance.killsCount == 3)
-        {
-            Player.IsVictorious = true;
-            Player.StateManager.SwitchState(Player.StateManager.victoryState);
-        }
+        KillsIndicator.Instance.UpdateKillsCount();
         Destroy(gameObject);
     }
     

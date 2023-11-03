@@ -53,13 +53,14 @@ public class WeaponManager : MonoBehaviour
                     }
                 }
             } 
-            if (other.CompareTag("EnemyHitbox"))
+            else if (other.CompareTag("EnemyHitbox"))
             {
                 Debug.Log("Hit Enemy!");
                 EnemyManager enemy = other.GetComponentInParent<EnemyManager>();
                 EnemyStats enemyStats = other.GetComponentInParent<EnemyStats>();
                 if (enemy != null && enemyStats != null)
                 {
+                    if (enemy.IsDead) return;
                     enemyStats.DepleteHealth(weaponDamage);
                     if (enemy.IsDead)
                     {
@@ -76,7 +77,21 @@ public class WeaponManager : MonoBehaviour
                         }
                     }
                 }
-            } 
+            }
+            else if (other.CompareTag("SpawnerHitbox"))
+            {
+                Debug.Log("Hit Spawner!");
+                EnemyStats enemyStats = other.GetComponentInParent<EnemyStats>();
+                if (enemyStats != null)
+                {
+                    enemyStats.DepleteHealth(weaponDamage);
+                    if (enemyStats.IsDead())
+                    {
+                        enemyStats.Die();
+                        enemyStats.Destroy();
+                    }
+                }
+            }
         }
     }
 }

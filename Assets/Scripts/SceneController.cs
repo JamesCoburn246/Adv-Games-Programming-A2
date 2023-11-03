@@ -1,14 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 public class SceneController : MonoBehaviour
 {
-    public SceneController Instance { get; private set; }
-    [SerializeField] private string entryScene;
-    
+    public static SceneController Instance { get; private set; }
 
     private void Awake()
     {
@@ -25,19 +23,26 @@ public class SceneController : MonoBehaviour
 
     public void LoadGame()
     {
-        Cursor.visible = false;
-        Time.timeScale = 1;
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+    
+    public void ReloadGame()
+    {
+        if (SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 
     public void LoadMenu()
     {
-        SceneManager.LoadScene(0);
-        Cursor.visible = true;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+        // SceneManager.LoadScene(0);
     }
-
-    public void LoadScene(string sceneName)
+    
+    public void QuitGame()
     {
-        SceneManager.LoadScene(sceneName);
+        Application.Quit();
+        UnityEditor.EditorApplication.isPlaying = false;
     }
 }

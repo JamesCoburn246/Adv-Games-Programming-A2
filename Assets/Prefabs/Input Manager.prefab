@@ -57,4 +57,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a4a5b444d0ff6045aabab6156e6a022, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameObjectToToggle: {fileID: 0}
+  gameObjectToToggle: {fileID: 474216580648917503, guid: 156038d55e0b4074991502eb1776c085, type: 3}

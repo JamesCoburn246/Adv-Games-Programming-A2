@@ -20,7 +20,7 @@ public class EnemyStateManager
         chaseState = new ChaseState(this, enemy);
         damageState = new DamageState(this, enemy);
         deathState = new DeathState(this, enemy);
-        CurrentState = patrolState;
+        CurrentState = idleState;
         CurrentState?.Enter();
     }
 
@@ -199,11 +199,6 @@ public class EnemyStateManager
             {
                 enemy.Animator.SetTrigger("Attack");
                 timePassed = enemy.attackCooldownTime;
-                enemy.Agent.isStopped = true;
-            }
-            else
-            {
-                enemy.Agent.isStopped = false;
             }
         }
     }

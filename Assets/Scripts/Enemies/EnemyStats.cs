@@ -1,47 +1,78 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyStats : MonoBehaviour
 {
     [SerializeField] 
     private float maxHealth;
-
-    private EnemyManager enemy;
-
-    // public float maxDamage;
-    
-    // ------ current stats ---------- //
-    private float _currentHealth;
-
+    [SerializeField]
     public EnemyHealthIndicator healthIndicator;
 
-    // Start is called before the first frame update
-    private void Start()
+    // --- Current stats --- //
+
+    private float _currentHealth;
+    private bool _isAlive = true;
+
+    private void OnEnable()
     {
         _currentHealth = maxHealth;
-        healthIndicator = GetComponentInChildren<EnemyHealthIndicator>();
-        enemy = GetComponent<EnemyManager>();
-        healthIndicator.SetMaxHealth(_currentHealth);
+        // Fetch indicator if one isn't specified.
+        if (healthIndicator == null)
+        {
+            healthIndicator = GetComponentInChildren<EnemyHealthIndicator>();
+            healthIndicator.SetMaxHealth(_currentHealth);
+        }
     }
 
-    // Update is called once per frame
-    private void Update()
+    // --- Health Getter Setter --- //
+
+    public float GetCurrentHealth()
     {
-
+        return _currentHealth;
     }
-    
-    // --------------- Health Stuff ------------------- //
 
     public void DepleteHealth(float value)
     {
-        if (enemy.IsDead) return;
+        if (!_isAlive) return;
+
         _currentHealth -= value;
         _currentHealth = Mathf.Clamp(_currentHealth, 0, maxHealth);
         healthIndicator.SetCurrentHealth(_currentHealth);
         if (_currentHealth <= 0)
         {
-            enemy.IsDead = true;
+            Die();
         }
+    }
+
+    // --- Misc --- //
+
+    public bool IsAlive()
+    {
+        return _isAlive;
+    }
+
+    public bool IsDead()
+    {
+        return !_isAlive;
+    }
+
+    public void Revive()
+    {
+        if (IsAlive()) { return; }
+        
+        _isAlive = true;
+        _currentHealth = maxHealth;
+    }
+
+    public void Die()
+    {
+        if (IsDead()) { return; }
+
+        _isAlive = false;
+        _currentHealth = 0;
+    }
+
+    public void Destroy()
+    {
+        Destroy(gameObject);
     }
 }
