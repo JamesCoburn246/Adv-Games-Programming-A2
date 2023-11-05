@@ -104,12 +104,28 @@ public class CameraController : MonoBehaviour
                 // set the right z-distance
                 _mainCam.orthographicSize = camIsoDistance;
             }
-            // turn the cam if tab is pressed
-            if (InputManager.Instance.TurnCamInput)
+            // Turn the cam if Q/E is pressed
+            if (InputManager.Instance.TurnCamInputLeft)
             {
-                InputManager.Instance.TurnCamInput = false;
-                _currCamIndex++;
-                if (_currCamIndex > 3) _currCamIndex = 0;
+                InputManager.Instance.TurnCamInputLeft = false;
+                if (_currCamIndex == 3)
+                    _currCamIndex = 0;
+                else
+                    _currCamIndex++;
+            }
+            if (InputManager.Instance.TurnCamInputRight)
+            {
+                InputManager.Instance.TurnCamInputRight = false;
+                if (_currCamIndex == 0)
+                    _currCamIndex = 3;
+                else 
+                    _currCamIndex--;
+            }
+            // Toggle views if tab is pressed.
+            if (InputManager.Instance.ChangeCamMode)
+            {
+                InputManager.Instance.ChangeCamMode = false;
+                isoView = !isoView;
             }
         }
     }
