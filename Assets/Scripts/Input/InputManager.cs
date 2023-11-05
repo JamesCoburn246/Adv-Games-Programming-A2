@@ -20,8 +20,10 @@ public class InputManager : MonoBehaviour
     Coroutine _attackWaitCoroutine;
     const float AttackInputDuration = 0.03f;
 
-    public bool TurnCamInput { get; set; }
-    
+    public bool TurnCamInputLeft { get; set; }
+    public bool TurnCamInputRight { get; set; }
+    public bool ChangeCamMode { get; set; }
+
     public bool PauseInput { get; set; }
 
     public VisibilityToggler MenuToggler { get; set; }
@@ -78,7 +80,9 @@ public class InputManager : MonoBehaviour
                 _attackWaitCoroutine = StartCoroutine(AttackWait());
             }
             LookInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
-            TurnCamInput = Input.GetKeyDown(KeyCode.Tab);            
+            TurnCamInputLeft = Input.GetKeyDown(KeyCode.Q);
+            TurnCamInputRight = Input.GetKeyDown(KeyCode.E);
+            ChangeCamMode = Input.GetKeyDown(KeyCode.Tab);
         }
         else
         {
@@ -87,7 +91,9 @@ public class InputManager : MonoBehaviour
             SprintInput = false;
             AttackInput = false;
             LookInput = Vector2.zero;
-            TurnCamInput = false;            
+            TurnCamInputLeft = false;
+            TurnCamInputRight = false;
+            ChangeCamMode = false;
         }
     }
 

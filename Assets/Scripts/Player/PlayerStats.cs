@@ -6,17 +6,16 @@ using UnityEngine.UI;
 
 public class PlayerStats : MonoBehaviour
 {
-    
+    private bool _staminaReplenishLock;
+
     // ---------- max stats ------------- //
 
     [SerializeField]
     private float maxHealth;
     [SerializeField]
     private float maxStamina;
-
-    private bool _staminaReplenishLock;
-    // public float maxDamage;
-    // public float maxArmor;
+    [SerializeField]
+    private float staminaRegen;
     
     // ------ current stats ---------- //
     private float _currentHealth;
@@ -97,7 +96,7 @@ public class PlayerStats : MonoBehaviour
         // wait for 10 seconds
         yield return new WaitForSeconds(10f);
         // then increase the stamina by 25 pts (to be changed)
-        IncreaseStamina(25);
+        IncreaseStamina(staminaRegen);
         // release the lock because the coroutine has ended
         _staminaReplenishLock = false;
     }
